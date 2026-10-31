@@ -25,11 +25,12 @@
   // =====================================================================
   // notices: toasts, banners and goal-complete cards share one stack, so they can never overlap
   // =====================================================================
-  const MAX_NOTICES = 3;
-  const shown = [], pending = [];
+  // at most 2 notices on screen, fading ones included; goals completing together merge into one card
+  const MAX_NOTICES = 2, MERGE_WINDOW = 1;
+  const shown = [], pending = [], fading = [];
   function pumpNotices() {
     const box = $('notices');
-    while (shown.length < MAX_NOTICES && pending.length) {
+    while (shown.length + fading.length < MAX_NOTICES && pending.length) {
       const n = pending.shift(), el = document.createElement('div');
       el.className = 'notice ' + n.kind; el.innerHTML = n.html;
       box.appendChild(el);
@@ -38,9 +39,8 @@
   }
   function dropNotice(n) {
     const i = shown.indexOf(n); if (i < 0) return;
-    shown.splice(i, 1); n.el.classList.add('out');
-    setTimeout(() => { if (n.el.parentNode) n.el.parentNode.removeChild(n.el); }, 260);
-    pumpNotices();
+    shown.splice(i, 1); fading.push(n); n.el.classList.add('out');
+    setTimeout(() => { fading.splice(fading.indexOf(n), 1); if (n.el.parentNode) n.el.parentNode.removeChild(n.el); pumpNotices(); }, 260);
   }
   function notify(kind, html, ttl) {
     const dup = pending.findIndex((p) => p.kind === kind && p.html === html);
@@ -50,11 +50,39 @@
     pending.push({ kind, html, ttl });
     pumpNotices();
   }
+  // goal cards: a goal finishing within ~1 s of the last one folds into that card (live, or still queued)
+  let goalBatch = null;
+  function goalHtml(b) {
+    const title = b.n > 1 ? b.n + ' goals complete!' : 'Goal complete!';
+    return `<div class="gstar">${HC.ico('star')}</div><div class="gpm"><div class="gp1">${title}</div><div class="gp3">${rewardChips(b.rew)}</div></div>`;
+  }
+  function addGoalNotice(q) {
+    const now = performance.now() / 1000, b = goalBatch;
+    if (b && now - b.t < MERGE_WINDOW && (shown.includes(b.live) || pending.includes(b.item))) {
+      b.n++; b.t = now;
+      const r = b.rew;
+      if (q.rew.res) { r.res = r.res || {}; for (const k in q.rew.res) r.res[k] = (r.res[k] || 0) + q.rew.res[k]; }
+      if (q.rew.xp) r.xp = (r.xp || 0) + q.rew.xp;
+      if (q.rew.bp) r.bp = (r.bp || []).concat(q.rew.bp);
+      if (q.rew.paint) r.paint = q.rew.paint;
+      const html = goalHtml(b);
+      if (pending.includes(b.item)) b.item.html = html;
+      else { b.live.el.innerHTML = html; b.live.ttl = 2.2; }
+      return;
+    }
+    const rew = { res: Object.assign({}, q.rew.res), xp: q.rew.xp, bp: (q.rew.bp || []).slice(), paint: q.rew.paint };
+    goalBatch = { n: 1, t: now, rew, item: null, live: null };
+    notify('goal', goalHtml(goalBatch), 2.2);
+    goalBatch.item = pending[pending.length - 1];
+    goalBatch.live = shown[shown.length - 1];
+    if (goalBatch.item && shown.includes(goalBatch.live) && !pending.includes(goalBatch.item)) goalBatch.item = null;
+    else goalBatch.live = null;
+  }
   HC.toast = (msg) => notify('toast', msg.replace(/&/g, '&amp;').replace(/</g, '&lt;'), 2);
   HC.banner = (t, s) => notify('banner', `<b>${t}</b><small>${s || ''}</small>`, 2.6);
   const goalShowing = () => shown.some((n) => n.kind === 'goal') || pending.some((n) => n.kind === 'goal');
   function goalDone(q) {
-    notify('goal', `<div class="gstar">${HC.ico('star')}</div><div class="gpm"><div class="gp1">Goal complete!</div><div class="gp3">${rewardChips(q.rew)}</div></div>`, 2.2);
+    addGoalNotice(q);
     HC.audio.play('fanfare');
     HC.fx.confetti(110);
     HC.fx.confettiBurst(HC.view.cw / 2, HC.view.ch * 0.2, 50);

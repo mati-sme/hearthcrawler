@@ -1,5 +1,5 @@
 /* Hearthcrawler service worker: cache-first, network fallback, versioned cache */
-const VERSION = '1.2.1';
+const VERSION = '1.2.2';
 const CACHE = 'hearthcrawler-v' + VERSION;
 const ASSETS = [
   './', 'index.html', 'style.css', 'manifest.webmanifest',

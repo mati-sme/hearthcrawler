@@ -1,7 +1,7 @@
 (function () {
   'use strict';
   const HC = (window.HC = window.HC || {});
-  HC.VERSION = '1.2.1';
+  HC.VERSION = '1.2.2';
   HC.DT = 1 / 60;
 
   // ---------- pacing knobs (see PROMPT3 pacing pass) ----------

@@ -811,7 +811,8 @@
   // ---------- time ----------
   HC.nightness = function () {
     const t = S0().t;
-    if (t < 165) return 0; if (t < 185) return (t - 165) / 20; if (t < 255) return 1; return 1 - (t - 255) / 15;
+    const dusk = HC.DAY_LEN - 8, dawn = HC.CYCLE - 10;
+    if (t < dusk) return 0; if (t < dusk + 16) return (t - dusk) / 16; if (t < dawn) return 1; return 1 - (t - dawn) / 10;
   };
   function updateTime(dt) {
     const S = S0();
