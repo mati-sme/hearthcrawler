@@ -99,6 +99,13 @@
       c.lineWidth = 6; c.strokeStyle = '#7a7a8a'; c.beginPath(); c.arc(32, 26, 11, Math.PI, 0); c.stroke();
       rr(c, 14, 26, 36, 28, 7); c.fillStyle = '#9a9aaa'; c.fill();
     },
+    caravan(c) { // little wagon with a round-top cover
+      c.fillStyle = '#7a4a28'; rr(c, 6, 30, 52, 20, 5); c.fill();
+      c.fillStyle = '#f4e3c0'; c.beginPath(); c.moveTo(11, 32); c.quadraticCurveTo(32, 2, 53, 32); c.closePath(); c.fill();
+      c.strokeStyle = '#a8793f'; c.lineWidth = 3; c.stroke();
+      c.fillStyle = '#4a3020'; [18, 46].forEach((x) => { c.beginPath(); c.arc(x, 52, 8, 0, 7); c.fill(); });
+      c.fillStyle = '#c9a46a'; [18, 46].forEach((x) => { c.beginPath(); c.arc(x, 52, 3, 0, 7); c.fill(); });
+    },
     check(c) {
       c.lineWidth = 9; c.lineCap = 'round'; c.lineJoin = 'round'; c.strokeStyle = '#3fb84f';
       c.beginPath(); c.moveTo(12, 34); c.lineTo(27, 48); c.lineTo(52, 16); c.stroke();

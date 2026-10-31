@@ -168,7 +168,7 @@ try {
   await S(() => { __HC.state.hp = __HC.api.maxHP(); });
   const day = await S(() => window.__bot(1800, null, 'wood'));          // ~3 min of game time chopping
   check('simulated ~3 minutes of day play', true, `maxHostile=${day.maxHostile}`);
-  await S(() => { __HC.setTime(176); __HC.state.hp = __HC.api.maxHP(); });
+  await S(() => { __HC.setTime(__HC.api.DAY_LEN - 4); __HC.state.hp = __HC.api.maxHP(); });
   await S(() => __HC.step(900));
   const nightInfo = await S(() => ({ night: __HC.runtime.night, t: __HC.state.t }));
   check('night arrives', nightInfo.night, JSON.stringify(nightInfo));
@@ -177,7 +177,7 @@ try {
   const kills = await S(() => __HC.state.stats.kills);
   check('combat happened (mobs poofed)', kills > 0, `kills=${kills}`);
   // make sure a few mobs are on screen for the screenshot
-  await S(() => { __HC.state.hp = __HC.api.maxHP(); __HC.setTime(200); const R = __HC.runtime, P = R.P; for (let i = 0; i < 5; i++) __HC.api.spawnMob(['raider', 'howler', 'slime', 'raider', 'sling'][i], P.x + (i - 2) * 70, P.y - 120 - (i % 2) * 40, { rush: true }); __HC.step(40); });
+  await S(() => { __HC.state.hp = __HC.api.maxHP(); __HC.setTime(__HC.api.DAY_LEN + 20); const R = __HC.runtime, P = R.P; for (let i = 0; i < 5; i++) __HC.api.spawnMob(['raider', 'howler', 'slime', 'raider', 'sling'][i], P.x + (i - 2) * 70, P.y - 120 - (i % 2) * 40, { rush: true }); __HC.step(40); });
   await blockers();
   await page.screenshot({ path: path.join(SHOTS, '03-night-combat.png') });
   await S(() => { __HC.setTime(20); __HC.step(5); });

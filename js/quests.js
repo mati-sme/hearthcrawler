@@ -79,7 +79,6 @@
       HC.fx.confetti(70);
       HC.fx.sparkle(HC.R.P.x, HC.R.P.y, 24, 100);
       HC.fx.text(HC.R.P.x, HC.R.P.y - 40, 'LEVEL UP! ' + S.lvl, '#ffd84a', 22);
-      HC.banner('⭐ Level ' + S.lvl + '!', 'Pick a perk');
     }
   };
   HC.rollPerks = function () {

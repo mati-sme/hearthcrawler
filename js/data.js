@@ -1,7 +1,7 @@
 (function () {
   'use strict';
   const HC = (window.HC = window.HC || {});
-  HC.VERSION = '1.0.0';
+  HC.VERSION = '1.1.0';
   HC.DT = 1 / 60;
 
   HC.clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
@@ -210,6 +210,7 @@
   q('level', null, 3, 'Reach level 3', '⭐', { res: { stone: 12, scrap: 6 }, xp: 0 });
   q('night', null, 1, 'Survive your first night', '🌙', { res: { wood: 20, scrap: 10, food: 6 }, xp: 120 });
   q('build', 'lantern', 1, 'Build a Lantern', '🏮', { res: { scrap: 6 }, xp: 50 });
+  q('chassis', null, 2, 'Expand the Chassis (Lv 2)', '🚚', { res: { wood: 20, scrap: 10 }, xp: 80 });
   q('build', 'furnace', 1, 'Build a Furnace', '🔥', { res: { stone: 10, scrap: 10 }, xp: 70 });
   q('gather', 'scrap', 20, 'Salvage 20 scrap', '⚙️', { res: { scrap: 12, wood: 10 }, xp: 50 });
   q('craft', 'smelt', 4, 'Smelt 4 metal plates', '🔩', { res: { scrap: 8 }, xp: 60 });
@@ -218,6 +219,7 @@
   q('craft', 'bow', 1, 'Craft a Bow', '🏹', { res: { wood: 12, scrap: 6 }, xp: 70 });
   q('build', 'turret', 1, 'Build a Turret', '🎯', { res: { scrap: 12, wood: 10 }, xp: 90 });
   q('craft', 'armor1', 1, 'Craft Scrap Armor', '🦺', { res: { food: 8, scrap: 8 }, xp: 80 });
+  q('chassis', null, 3, 'Expand the Chassis (Lv 3)', '🚚', { res: { wood: 25, scrap: 15, metal: 3 }, xp: 120 });
   q('build', 'engine', 1, 'Build an Engine', '⚙️', { res: { scrap: 10, wood: 15 }, xp: 100 });
   q('craft', 'fuel', 2, 'Brew 2 batches of fuel', '⛽', { res: { wood: 15, scrap: 6 }, xp: 50 });
   q('travel', 'pine', 1, 'Travel to the Pine Forest', '🌲', { res: { wood: 25, food: 8 }, xp: 150 });
@@ -227,7 +229,6 @@
   q('craft', 'crossbow', 1, 'Craft a Crossbow', '🎯', { res: { metal: 6, wood: 12 }, xp: 120 });
   q('upg', 'turret', 2, 'Upgrade the Turret to Lv 2', '🎯', { res: { scrap: 15, metal: 4 }, xp: 100 });
   q('build', 'garden', 1, 'Build a Garden', '🌱', { res: { wood: 15, food: 8 }, xp: 90 });
-  q('chassis', null, 2, 'Expand the Chassis (Lv 2)', '🚚', { res: { wood: 30, scrap: 15 }, xp: 140 });
   q('upg', 'engine', 2, 'Upgrade the Engine to Lv 2', '⚙️', { res: { scrap: 20, fuel: 6 }, xp: 120 });
   q('travel', 'badlands', 1, 'Travel to the Rocky Badlands', '🏜️', { res: { stone: 30, scrap: 15 }, xp: 200 });
   q('gather', 'stone', 25, 'Mine 25 badlands stone', '🪨', { res: { stone: 25, metal: 4 }, xp: 120 });
@@ -243,8 +244,8 @@
   q('upg', 'walls', 3, 'Upgrade Armor Plating to Lv 3', '🛡️', { res: { metal: 12, stone: 25 }, xp: 200 });
   q('upg', 'engine', 4, 'Upgrade the Engine to Lv 4', '⚙️', { res: { scrap: 40, fuel: 14 }, xp: 240 });
   q('travel', 'frost', 1, 'Travel to the Frost Peaks', '❄️', { res: { food: 25, metal: 12 }, xp: 350 });
-  q('night', null, 3, 'Survive 3 more nights', '🌙', { res: { metal: 15, scrap: 30, food: 20 }, xp: 400 });
-  q('chassis', null, 3, 'Expand the Chassis (Lv 3)', '🚚', { res: { wood: 50, scrap: 40, metal: 10 }, xp: 300 });
+  q('night', null, 1, 'Survive another night', '🌙', { res: { metal: 15, scrap: 30, food: 20 }, xp: 400 });
+  q('chassis', null, 4, 'Expand the Chassis (Lv 4)', '🚚', { res: { wood: 50, scrap: 40, metal: 10 }, xp: 300 });
   q('upg', 'engine', 5, 'Upgrade the Engine to Lv 5', '⚙️', { res: { scrap: 60, fuel: 20 }, xp: 350 });
   q('travel', 'ember', 1, 'Travel to the Ember Volcano', '🌋', { res: { metal: 20, fuel: 15 }, xp: 500 });
   q('boss', 'golem', 1, 'Defeat the Ember Golem!', '🗿', { res: { metal: 60, scrap: 80, food: 40 }, xp: 2500, paint: 'golem' });
@@ -259,17 +260,17 @@
       return { t: 'dist', a: null, n: d, text: `Reach Distance ${d}`, ic: '🛣️', rew: { res: rr({ metal: 12, scrap: 30, fuel: 8 }), xp: Math.round(400 * sc) } };
     }
     if (r === 1) {
-      const res = ['wood', 'stone', 'scrap'][k % 3], n = 40 + 10 * k;
+      const res = ['wood', 'stone', 'scrap'][k % 3], n = 40 + 6 * Math.min(k, 12);
       return { t: 'gather', a: res, n, text: `Gather ${n} ${res}`, ic: '🧺', rew: { res: rr({ metal: 8, food: 15 }), xp: Math.round(250 * sc) } };
     }
     if (r === 2) {
-      const n = 15 + 3 * k;
+      const n = 15 + 2 * Math.min(k, 12);
       return { t: 'kill', a: null, n, text: `Defeat ${n} mobs`, ic: '👊', rew: { res: rr({ scrap: 25, metal: 8 }), xp: Math.round(300 * sc) } };
     }
     if (r === 3) {
       return { t: 'night', a: null, n: 1, text: 'Survive another night', ic: '🌙', rew: { res: rr({ metal: 10, food: 20, wood: 30 }), xp: Math.round(350 * sc) } };
     }
-    return { t: 'chest', a: null, n: 3, text: 'Open 3 treasure chests', ic: '🎁', rew: { res: rr({ metal: 10, fuel: 10, scrap: 20 }), xp: Math.round(300 * sc) } };
+    return { t: 'chest', a: null, n: 2, text: 'Open 2 treasure chests', ic: '🎁', rew: { res: rr({ metal: 10, fuel: 10, scrap: 20 }), xp: Math.round(300 * sc) } };
   };
 
   // ---------- achievements (3 stars each) ----------
@@ -287,8 +288,8 @@
     { id: 'combo', name: 'Combo King', icon: '🔥', steps: [3, 6, 12], get: (S) => S.stats.bestCombo, text: (n) => `Reach a x${n} combo` },
   ];
 
-  HC.DAY_LEN = 180;
-  HC.NIGHT_LEN = 90;
-  HC.CYCLE = 270;
+  HC.DAY_LEN = 120;
+  HC.NIGHT_LEN = 60;
+  HC.CYCLE = 180;
   HC.WORLD = 3072;
 })();

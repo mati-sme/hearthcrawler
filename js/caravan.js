@@ -51,6 +51,16 @@
     done(slot);
     return true;
   };
+  // remove a module for a 60% refund, so a full chassis can never block a goal
+  HC.demolishMod = function (slot) {
+    const S = S0(), s = S.grid.slots[slot];
+    if (!s) return false;
+    for (let l = 1; l <= s.l; l++) { const c = HC.modCost(s.m, l); for (const k in c) HC.addStore(k, c[k] * 0.6); }
+    S.grid.slots[slot] = null;
+    const p = HC.slotPos(slot); HC.fx.puff(p.x, p.y);
+    done(slot);
+    return true;
+  };
   HC.upgradeChassis = function () {
     const S = S0(), l = S.grid.chassis;
     if (l >= HC.CHASSIS.length) return false;

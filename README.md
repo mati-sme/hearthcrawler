@@ -18,15 +18,17 @@ Play: https://mati-sme.github.io/hearthcrawler/
 - Resources: wood, stone, scrap, food, metal, fuel; carry bag auto-deposits at the caravan.
 - Crafting tiers 0–3 (axes, picks, spear, bow, crossbow, blaster, bombs, armor, medkits…) gated by Workbench / Furnace levels and blueprints.
 - Caravan modules on a grid (2×2 → 3×4): Storage, Workbench, Bed, Furnace, Turret, Armor Plating, Engine, Garden, Lantern — levels 1–5.
-- Day/night cycle (3 min day, 1.5 min night) with raiders, howlers and more; a damaged caravan just works at half power until repaired.
+- Day/night cycle (2 min day, 1 min night) with raiders, howlers and more; a damaged caravan just works at half power until repaired.
 - World map: Meadow → Pine Forest → Rocky Badlands → Scrap Wastes → Frost Peaks → Ember Volcano → endless Far Roads. Animated travel with roadside events.
 - 3 bosses with telegraphed attacks: Big Boar King, Raider Warlord (war-wagon), Ember Golem.
 - XP, levels with 1-of-3 perks, achievements with stars, caravan paints and flags, lucky crates, treasure chests, combos.
+- Goal-complete and level-up notices are small, queued, non-blocking toasts; an edge icon with distance always points back to the caravan; modules can be removed (60% refund) so a full chassis never blocks a goal.
 - Never stuck: nodes respawn, death only costs 20% of carried items, gentle cost curves, hints for missing resources.
 - Autosave to localStorage (`hearthcrawler-save-v1`), service worker for offline play.
 
 ## Development
 - Run any static server in this folder (e.g. `python3 -m http.server`) and open `index.html`.
 - Test: `node test/play.mjs` (Playwright + system Chrome; set `PW_PATH` to a playwright-core install). Screenshots land in `test/shots/`.
+- Balance / anti-stall sim: `node test/balance.mjs` — an auto-play bot (`test/bot.js`) plays from a fresh save with no cheats for 60+ in-game minutes, logs every goal and level-up, and asserts: Scrap Wastes reached, all bosses beaten, Far Roads reached, longest gap between goals < 4 min, zero console errors. Writes `08-boss.png` and `09-far-roads.png`. Env: `BAL_MINUTES`, `BAL_VERBOSE=1`.
 - Icons: `python3 tools/make_icons.py`.
 - Test hooks: `window.__HC` = `{ state, step(n), giveAll(n), setTime(t), questIndex(), version }`.

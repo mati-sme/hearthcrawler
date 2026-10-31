@@ -28,8 +28,8 @@
   HC.toast = function (msg) {
     const box = $('toasts'), el = document.createElement('div');
     el.className = 'toast'; el.textContent = msg; box.appendChild(el);
-    while (box.children.length > 3) box.removeChild(box.firstChild);
-    setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 3000);
+    while (box.children.length > 2) box.removeChild(box.firstChild);
+    setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 2000);
   };
   HC.banner = function (t, s) {
     const b = $('banner');
@@ -37,18 +37,27 @@
     b.classList.remove('hidden'); b.style.animation = 'none'; void b.offsetWidth; b.style.animation = '';
     bannerT = 2.8;
   };
+  // goal-complete toasts queue up one at a time: compact, non-blocking, just below the goal card
+  const goalQ = [];
   function hideGoalPop() {
     const gp = $('goalpop'); if (gp.classList.contains('hidden')) return;
-    gp.classList.add('out'); setTimeout(() => { gp.classList.add('hidden'); gp.classList.remove('out'); }, 320); goalT = 0;
+    gp.classList.add('out'); goalT = 0;
+    setTimeout(() => { gp.classList.add('hidden'); gp.classList.remove('out'); showNextGoal(); }, 260);
+  }
+  function showNextGoal() {
+    const gp = $('goalpop');
+    if (!goalQ.length || !gp.classList.contains('hidden')) return;
+    const q = goalQ.shift();
+    gp.innerHTML = `<div class="gstar">${HC.ico('star')}</div><div class="gpm"><div class="gp1">Goal complete!</div><div class="gp3">${rewardChips(q.rew)}</div></div>`;
+    gp.classList.remove('hidden', 'out'); gp.style.animation = 'none'; void gp.offsetWidth; gp.style.animation = '';
+    goalT = 1.8;
   }
   function goalDone(q) {
-    const gp = $('goalpop');
-    gp.innerHTML = `<div class="gstar">${HC.ico('star')}</div><div class="gp1">GOAL COMPLETE!</div><div class="gp2">${q.text}</div><div class="gp3">${rewardChips(q.rew)}</div>`;
-    gp.classList.remove('hidden', 'out'); gp.style.animation = 'none'; void gp.offsetWidth; gp.style.animation = '';
-    goalT = 3.2;
+    goalQ.push(q); if (goalQ.length > 4) goalQ.shift();
+    showNextGoal();
     HC.audio.play('fanfare');
     HC.fx.confetti(110);
-    HC.fx.confettiBurst(HC.view.cw / 2, HC.view.ch * 0.34, 50);
+    HC.fx.confettiBurst(HC.view.cw / 2, HC.view.ch * 0.2, 50);
     const g = $('goal'); g.classList.remove('pop'); void g.offsetWidth; g.classList.add('pop');
     cache.goalKey = null;
   }
@@ -65,6 +74,8 @@
     $('hunPill').addEventListener('click', () => HC.eat(false));
     $('hpPill').addEventListener('click', () => HC.useHeal(false));
   }
+
+  function openPerks() { perkList = HC.rollPerks(); open('perk'); }
 
   function actionState() {
     const s = S(), dc = HC.cavDist(R.P.x, R.P.y);
@@ -94,6 +105,8 @@
     $('app').classList.toggle('travel', !!HC.T.on);
     hudAcc += dt; if (hudAcc < 0.1) return; hudAcc = 0;
     const s = S(), P = R.P;
+    const gb = Math.round($('goal').getBoundingClientRect().bottom - $('app').getBoundingClientRect().top);
+    if (gb > 0 && cache.gbot !== gb) { cache.gbot = gb; $('app').style.setProperty('--gbot', gb + 'px'); }
     // bars
     const hmax = HC.maxHP();
     setW($('hpFill'), 'hpw', 100 * s.hp / hmax); setTxt($('hpTxt'), 'hpt', '' + Math.ceil(s.hp));
@@ -148,8 +161,12 @@
     $('action').classList.toggle('cd', a === 'roll' && P.rollCd > 0);
     $('action').classList.toggle('go', a === 'repair');
     // auto-open perk picker
-    if (s.pendingPerks > 0 && !cur && !modalOpen && !tutOpen && !HC.T.on && goalT <= 0) {
-      perkDelay += 0.1; if (perkDelay > 1.0) { perkDelay = 0; perkList = HC.rollPerks(); open('perk'); }
+    // perk badge always shows; the picker only auto-opens when no enemies are near
+    const pb = $('perkbadge');
+    pb.classList.toggle('hidden', !(s.pendingPerks > 0) || !!cur || HC.T.on);
+    setTxt(pb, 'pbt', '⭐ Level ' + s.lvl + '! Pick a perk');
+    if (s.pendingPerks > 0 && !cur && !modalOpen && !tutOpen && !HC.T.on && goalT <= 0 && HC.nearestMobDist(300) < 0) {
+      perkDelay += 0.1; if (perkDelay > 2.0) { perkDelay = 0; openPerks(); }
     } else perkDelay = 0;
   }
 
@@ -231,6 +248,7 @@
       const cost = max ? null : HC.modCost(sl.m, sl.l + 1), aff = cost && HC.canAfford(cost), hint = q.t === 'upg' && q.a === sl.m;
       h += `<div class="card ${hint ? 'hint' : ''}"><div class="cic">${m.icon}</div><div class="cmid"><b>Now: ${m.desc(sl.l)}</b>${max ? '<small>Fully upgraded!</small>' : `<small>Next: ${m.desc(sl.l + 1)}</small><div class="costs">${costChips(cost)}</div>`}</div>` +
         (max ? '<span class="tag">MAX</span>' : `<button class="btn ${aff ? '' : 'orange'}" data-act="upg" ${aff ? '' : 'disabled'}>Upgrade</button>`) + '</div>';
+      h += '<div class="card"><div class="cic">🧹</div><div class="cmid"><b>Remove module</b><small>Free the slot · get 60% back</small></div><button class="btn ghost" data-act="demo">Remove</button></div>';
       if (sl.m === 'bed' && sl.l >= 3 && R.night) h += '<div class="card"><div class="cic">😴</div><div class="cmid"><b>Sleep until dawn</b><small>Skip the rest of the night</small></div><button class="btn" data-act="sleep">Sleep</button></div>';
     }
     // chassis
@@ -338,6 +356,7 @@
       case 'sel': selSlot = +d.slot; HC.audio.play('click'); break;
       case 'build': HC.buildMod(selSlot, d.mod); break;
       case 'upg': HC.upgradeMod(selSlot); break;
+      case 'demo': confirmBox('Remove this module?', 'You get 60% of the cost back.', 'Remove', () => { HC.demolishMod(selSlot); refresh(); }); return;
       case 'chassis': HC.upgradeChassis(); break;
       case 'repair': HC.repair(); break;
       case 'sleep': if (HC.sleepTillDawn()) close(); return;
@@ -398,6 +417,7 @@
     $('tut-next').addEventListener('click', () => { HC.audio.init(); HC.audio.play('click'); if (tutStep >= TUT.length - 1) endTutorial(); else { tutStep++; renderTut(); } });
     $('tut-skip').addEventListener('click', endTutorial);
     $('goalpop').addEventListener('click', hideGoalPop);
+    $('perkbadge').addEventListener('click', () => { if (!HC.ui.paused() && S().pendingPerks > 0) openPerks(); });
     if (!S().set.tutDone) startTutorial();
   };
 })();

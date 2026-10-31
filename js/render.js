@@ -430,9 +430,32 @@
     c.beginPath(); c.moveTo(14, 0); c.lineTo(-6, -11); c.lineTo(-2, 0); c.lineTo(-6, 11); c.closePath(); c.stroke(); c.fill();
     c.restore();
   }
+  // caravan finder: icon badge + distance at the screen edge while the caravan is off-screen
+  function drawCaravanPointer(c, now) {
+    const z = view.z, G = HC.G, cx = W.cx, cy = (G.y0 + G.y1) / 2;
+    const sx = (cx - R.cam.x) * z, sy = (cy - R.cam.y) * z;
+    const m = 34, x0 = m, x1 = view.cw - m, y0 = 175, y1 = view.ch - 130;
+    if (sx > 0 && sx < view.cw && sy > 100 && sy < view.ch - 60) return;
+    const mx = view.cw / 2, my = (y0 + y1) / 2, dx = sx - mx, dy = sy - my;
+    const k = Math.min((x1 - mx) / Math.abs(dx || 1e-6), (y1 - my) / Math.abs(dy || 1e-6), 1);
+    const ax = mx + dx * k, ay = my + dy * k, ang = Math.atan2(dy, dx);
+    const dist = Math.round(Math.hypot(cx - R.P.x, cy - R.P.y) / 10), bob = Math.sin(now * 5) * 2;
+    c.save(); c.translate(ax, ay);
+    c.fillStyle = 'rgba(255,249,234,.95)'; c.strokeStyle = '#c9a46a'; c.lineWidth = 3;
+    c.beginPath(); c.arc(0, 0, 21, 0, 7); c.fill(); c.stroke();
+    c.drawImage(HC.icons.canvas('caravan'), -15, -16 + bob, 30, 30);
+    c.save(); c.rotate(ang); c.translate(27, 0);
+    c.fillStyle = '#ff9a2a'; c.strokeStyle = '#fff'; c.lineWidth = 2.5;
+    c.beginPath(); c.moveTo(9, 0); c.lineTo(-4, -9); c.lineTo(-4, 9); c.closePath(); c.stroke(); c.fill(); c.restore();
+    const txt = dist + 'm'; c.font = '900 12px system-ui, sans-serif'; c.textAlign = 'center';
+    const ty = ay > view.ch / 2 ? -28 : 36;
+    c.lineWidth = 4; c.strokeStyle = 'rgba(40,20,10,.85)'; c.strokeText(txt, 0, ty); c.fillStyle = '#fff'; c.fillText(txt, 0, ty);
+    c.restore();
+  }
   function drawArrows(c, now) {
-    if (!HC.S.set.arrows) return;
     c.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
+    drawCaravanPointer(c, now);
+    if (!HC.S.set.arrows) return;
     const t = R.arrowTarget;
     if (t) arrowTo(c, t.x, t.y, '#ffd84a', now);
     for (let i = 0; i < R.chests.length; i++) { const ch = R.chests[i]; if (ch.gold && ch.open <= 0 && !t) { arrowTo(c, ch.x, ch.y, '#ff9ae0', now); break; } }

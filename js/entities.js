@@ -94,7 +94,7 @@
     R.parts.forEach((p) => (p.on = false)); R.texts.forEach((p) => (p.on = false)); R.teles.forEach((p) => (p.on = false));
     R.chests.length = 0; R.boss = null; R.combo.n = 0; R.combo.t = 0;
     const G = HC.G;
-    if (spawnNearCaravan) { P.x = W.cx + 70; P.y = G.y1 + 60; }
+    if (spawnNearCaravan) { P.x = W.cx + 60; P.y = G.y1 + 36; }
     P.vx = P.vy = 0; P.roll = 0; P.inv = 1; P.gnode = null;
     R.cam.x = P.x - R.view.w / 2; R.cam.y = P.y - R.view.h / 2 + 60;
     if (S.cavHP < 0 || S.cavHP > HC.cavMax()) S.cavHP = HC.cavMax();
