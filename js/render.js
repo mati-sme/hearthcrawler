@@ -329,6 +329,7 @@
   }
   function drawLair(c, now) {
     const L = W.lair; if (!L) return;
+    const q = HC.curQuest(); if (q.t !== 'boss' || q.a !== L.boss) return; // quiet until its goal is up
     c.save(); c.translate(L.x, L.y);
     c.fillStyle = 'rgba(40,20,30,0.35)'; c.beginPath(); c.ellipse(0, 0, 96, 72, 0, 0, TAU); c.fill();
     c.strokeStyle = `rgba(255,${100 + 60 * Math.sin(now * 3)},70,0.85)`; c.lineWidth = 4; c.beginPath(); c.ellipse(0, 0, 88, 66, 0, 0, TAU); c.stroke();

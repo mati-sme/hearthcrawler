@@ -49,7 +49,8 @@ button:disabled { cursor: default; }
 .gbar i { display: block; height: 100%; width: 0; background: linear-gradient(#8ae07a, #4fc25a); border-radius: 8px; transition: width .25s; }
 .gbar span { position: absolute; inset: 0; text-align: center; font-size: 10px; font-weight: 900; line-height: 13px; color: #3a2a1a; }
 .ghint { font-size: 10.5px; font-weight: 800; color: #b0662a; margin-top: 2px; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 12px; }
-.grew { display: flex; flex-direction: column; gap: 2px; align-items: flex-end; }
+.grew { display: flex; flex-wrap: wrap; flex-direction: row; gap: 2px 3px; justify-content: flex-end; max-width: 46%; }
+.grew .rchip { font-size: 11px; padding: 1px 6px; }
 .rchip { font-size: 11px; font-weight: 900; background: rgba(255,255,255,.7); border-radius: 9px; padding: 1px 6px; white-space: nowrap; }
 .rchip .ic { width: 14px; height: 14px; vertical-align: -3px; }
 

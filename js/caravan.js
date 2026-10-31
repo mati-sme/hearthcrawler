@@ -112,6 +112,7 @@
     else if (r.kind === 'mat') HC.addStore(r.res, r.n);
     else { S.inv.owned[r.id] = true; HC.equipBest(); }
     S.stats.crafted++;
+    if (r.xp) HC.addXP(r.xp, true);
     HC.audio.play('craft');
     HC.fx.sparkle(HC.R.P.x, HC.R.P.y - 10, 12, 50);
     HC.fx.text(HC.R.P.x, HC.R.P.y - 34, r.name + '!', '#ffe9a0', 16);

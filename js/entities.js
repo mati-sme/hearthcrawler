@@ -21,7 +21,7 @@
   const P = R.P;
   const tmpN = [];
 
-  HC.hpMul = (d) => (d <= 6 ? 1 + 0.2 * (d - 1) : 2 + 0.12 * (d - 6));
+  HC.hpMul = (d) => (d <= 3 ? 1 + 0.2 * (d - 1) : d <= 6 ? 1.4 + 0.35 * (d - 3) : 2.45 + 0.15 * (d - 6));
   HC.dmgMul = (d) => 1 + 0.08 * (Math.min(d, 20) - 1);
 
   // =====================================================================
@@ -217,7 +217,7 @@
       fx.text(P.x, P.y - 44, 'x' + R.combo.n + ' COMBO!', '#ffd84a', 20);
       HC.addXP(R.combo.n * 2);
     }
-    HC.emit('kill', { type: m.type });
+    HC.emit('kill', { type: m.type, raid: !!(def.raid || m.rush), night: R.night });
     if (def.boss) bossDown(m);
   }
 
@@ -582,7 +582,7 @@
   }
   function harvest(n) {
     const S = S0(), d = NODE_D(n.type), tool = toolFor(n.type);
-    let amt = ri(d.amt[0], d.amt[1]) * tool.yld * (1 + 0.12 * HC.perk('loot')) * W.nodeYield;
+    let amt = ri(d.amt[0], d.amt[1]) * tool.yld * (1 + 0.12 * HC.perk('loot')) * W.nodeYield * HC.PACE.yield;
     amt = Math.max(1, Math.round(amt));
     dropRes(d.res, amt, n.x, n.y - 6, true);
     // bonus metal from rocks/scrap farther out
@@ -848,6 +848,8 @@
   function updateLair() {
     const L = W.lair;
     if (!L || R.boss) return;
+    const q = HC.curQuest(); // the lair stays quiet until its goal is up, so bosses can't be skipped past
+    if (q.t !== 'boss' || q.a !== L.boss) return;
     if (Math.hypot(P.x - L.x, P.y - L.y) < 400) {
       const m = spawnMob(L.boss, L.x, L.y);
       if (m) {

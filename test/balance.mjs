@@ -1,4 +1,4 @@
-// Anti-stall balance sim: an auto-play bot plays from a fresh save (no giveAll) for 60+ in-game minutes.
+// Anti-stall balance sim: an auto-play bot plays from a fresh save (no giveAll) for 150 in-game minutes.
 // Run: node test/balance.mjs   (env: PW_PATH, BAL_MINUTES, BAL_VERBOSE=1)
 import http from 'node:http';
 import fs from 'node:fs';
@@ -11,7 +11,7 @@ const pw = require(process.env.PW_PATH || '/workspace/projects/yt-shorts/node_mo
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SHOTS = path.join(ROOT, 'test', 'shots');
 fs.mkdirSync(SHOTS, { recursive: true });
-const MINUTES = +(process.env.BAL_MINUTES || 60);
+const MINUTES = +(process.env.BAL_MINUTES || 150);
 const VERBOSE = !!process.env.BAL_VERBOSE;
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.webmanifest': 'application/manifest+json' };
@@ -75,10 +75,19 @@ try {
   console.log(`goals completed: ${res.goals.length}   longest gap: ${fmt(maxGap)} (${maxGapGoal})   final t=${fmt(info.t)}   current goal: "${info.quest}" ${info.status}`);
   if (VERBOSE) console.log(res.log.join('\n'));
 
-  check('simulated at least 60 in-game minutes', info.t >= 60 * 60, fmt(info.t));
+  const bt = (z) => { const b = res.bosses.find((x) => x.z === z); return b ? b.t / 60 : NaN; };
+  const win = (name, z, lo, hi) => check(`${name} defeated at ${lo}-${hi} min (±10)`, bt(z) >= lo - 10 && bt(z) <= hi + 10, `${bt(z).toFixed(1)} min`);
+  const mid = res.levels.filter((l) => l.t >= 30 * 60 && l.t <= 110 * 60);
+  const cadence = mid.length > 1 ? (mid[mid.length - 1].t - mid[0].t) / 60 / (mid.length - 1) : NaN;
+  console.log(`mid-game level-up cadence (30-110 min): ${cadence.toFixed(1)} min per level   deaths: ${res.deaths}`);
+  check(`simulated at least ${MINUTES} in-game minutes`, info.t >= MINUTES * 60, fmt(info.t));
   check('reached the Scrap Wastes', res.zones.includes('scrap'));
-  check('defeated the first boss', res.bossDown.includes('badlands'));
+  win('Boar King', 'badlands', 25, 35);
+  win('Raider Warlord', 'scrap', 55, 75);
+  win('Ember Golem', 'ember', 100, 130);
+  check('first 5 goals within ~3 min', res.goals.length >= 5 && res.goals[4].t <= 200, res.goals[4] ? fmt(res.goals[4].t) : 'n/a');
   check('longest gap between goals < 4 min', maxGap < 240, `${fmt(maxGap)} at ${maxGapGoal}`);
+  check('mid-game level-ups every ~3-6 min', cadence >= 2.5 && cadence <= 6.5, cadence.toFixed(1) + ' min');
   check('reached Far Roads endless mode', res.zones.includes('far'), `maxDist ${res.maxDist}`);
   check('all 3 bosses defeated', res.bossDown.length >= 3, res.bossDown.join(','));
   check('zero console/page errors', problems.length === 0, problems.slice(0, 3).join(' | '));

@@ -210,10 +210,10 @@
       if (!hunt(false)) generic(['wood', 'stone', 'scrap', 'food']);
       return;
     }
-    if (q.t === 'night' || q.t === 'level') {
+    if (q.t === 'night' || q.t === 'level' || q.t === 'raid') {
       if (hostile && HC.cavDist(hostile.x, hostile.y) < 500) { hunt(false); return; }
       if (s.hunger < 55 && HC.have('food') < 3) { gatherRes('food') || hunt(true); return; }
-      if (q.t === 'night' && !night) { // stock up near the caravan until dusk
+      if ((q.t === 'night' || q.t === 'raid') && !night) { // stock up near the caravan until dusk
         generic(['wood', 'scrap', 'stone']); return;
       }
       if (!hunt(true)) generic(['wood', 'stone', 'scrap']);

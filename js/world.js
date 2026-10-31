@@ -31,7 +31,7 @@
   const NODE = {
     tree: { r: 18, cr: 9, hp: 4, res: 'wood', amt: [3, 4], resp: 50, stump: 1 },
     rock: { r: 20, cr: 16, hp: 5, res: 'stone', amt: [2, 3], resp: 60 },
-    scrap: { r: 18, cr: 14, hp: 3, res: 'scrap', amt: [2, 3], resp: 55 },
+    scrap: { r: 18, cr: 14, hp: 3, res: 'scrap', amt: [3, 5], resp: 55 },
     bush: { r: 15, cr: 0, hp: 1.5, res: 'food', amt: [2, 3], resp: 28 },
   };
   HC.NODE = NODE;
@@ -75,7 +75,7 @@
       }
       return true;
     };
-    const M = 150, scale = 1 + 0.08 * Math.min(dist - 1, 8);
+    const M = 150, scale = 1 + 0.04 * Math.min(dist - 1, 8);
     for (const type of ['tree', 'rock', 'scrap', 'bush']) {
       const want = Math.round(z.mix[type] * (z.far ? 1 : 1));
       const clumps = [];
@@ -139,7 +139,7 @@
     }
   };
   HC.killNode = function (n) {
-    n.alive = false; n.t = NODE[n.type].resp * (0.85 + Math.random() * 0.3);
+    n.alive = false; n.t = NODE[n.type].resp * HC.PACE.resp * (0.85 + Math.random() * 0.3);
     W.dead.push(n);
   };
 

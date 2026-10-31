@@ -21,6 +21,7 @@
       case 'chassis': return Math.min(q.n, S.grid.chassis);
       case 'level': return Math.min(q.n, S.lvl);
       case 'dist': return Math.min(q.n, S.maxDist);
+      case 'boss': return S.bossDown[BOSS_ZONE[q.a]] ? q.n : Math.min(q.n, S.q.p);
       case 'travel': return S.q.p > 0 || S.zone.id === q.a ? 1 : 0;
       case 'craft': { // gear you already own counts, so crafting ahead of a goal never gets you stuck
         const r = HC.REC[q.a];
@@ -38,6 +39,7 @@
   }
   HC.on('gather', (d) => ev('gather', d.res, d.n));
   HC.on('kill', () => ev('kill', undefined, 1));
+  HC.on('kill', (d) => { if (d.raid && d.night) ev('raid', undefined, 1); });
   HC.on('craft', (d) => ev('craft', d.id, d.n));
   HC.on('night', () => ev('night', undefined, 1));
   HC.on('chest', () => ev('chest', undefined, 1));
@@ -158,6 +160,7 @@
       }
       case 'kill': return { kill: 1, text: 'Walk near critters & slimes — you auto-attack!' };
       case 'boss': return { boss: 1, text: 'Find the glowing lair — dodge the red circles!' };
+      case 'raid': return { text: HC.R.night ? 'Fight the raiders at the caravan 🛡️' : 'Raiders come at night — build turrets & stock up 🌙' };
       case 'night': return { text: HC.R.night ? 'Defend the caravan until sunrise ☀️' : 'Build turrets & lanterns before dusk 🌙' };
       case 'level': return { text: 'Gather, craft & fight for XP' };
       case 'chest': return { text: 'Look for 🎁 chests near the caravan' };
