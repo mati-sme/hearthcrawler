@@ -1,0 +1,16 @@
+{
+  "name": "Hearthcrawler",
+  "short_name": "Hearthcrawler",
+  "description": "A cozy survival base-builder where your base is a moving caravan.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#3b2a1d",
+  "theme_color": "#3b2a1d",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

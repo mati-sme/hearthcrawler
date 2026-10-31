@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#3b2a1d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Hearthcrawler</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <canvas id="game"></canvas>
+  <div id="joyPad"></div>
+  <div id="joy" class="hidden"><div class="ring"></div><div class="knob"></div></div>
+
+  <div id="hud">
+    <div id="top">
+      <div class="pill bar" id="hpPill"><span class="pi" data-ic="heart"></span><div class="track"><div class="fill hp" id="hpFill"></div></div><b id="hpTxt">100</b></div>
+      <div class="pill bar" id="hunPill"><span class="pi" data-ic="food"></span><div class="track"><div class="fill hun" id="hunFill"></div></div></div>
+      <div class="pill clock" id="clock"><span class="pi" id="clockIc"></span><div class="ctx"><b id="clockTxt">Day 1</b><div class="cbar"><i id="clockFill"></i></div></div></div>
+      <div class="pill zone" id="zonePill"><div class="ctx"><b id="zoneTxt">Meadow</b><small id="zoneDist">Distance 1</small></div></div>
+    </div>
+
+    <div id="goal">
+      <div class="gic" id="gIc">🌲</div>
+      <div class="gmid">
+        <div class="gtxt" id="gTxt">Chop 8 wood</div>
+        <div class="gbar"><i id="gFill"></i><span id="gNum">0/8</span></div>
+        <div class="ghint" id="gHint"></div>
+      </div>
+      <div class="grew" id="gRew"></div>
+    </div>
+
+    <div id="boss" class="hidden"><b id="bossName">Boss</b><div class="track"><div class="fill" id="bossFill"></div></div></div>
+
+    <div id="side">
+      <button class="rbtn" id="btn-craft" aria-label="Craft">🛠<span class="lbl">Craft</span></button>
+      <button class="rbtn" id="btn-caravan" aria-label="Caravan">🏠<span class="lbl">Caravan</span></button>
+      <button class="rbtn" id="btn-map" aria-label="Map">🗺<span class="lbl">Map</span></button>
+      <button class="rbtn" id="btn-gear" aria-label="Gear">🎒<span class="lbl">Gear</span></button>
+      <button class="rbtn" id="btn-settings" aria-label="Settings">⚙️<span class="lbl">Menu</span></button>
+    </div>
+
+    <div id="res"></div>
+    <button id="action" aria-label="Action"><span id="actIc">🌀</span><small id="actTxt">Roll</small><em id="actBadge" class="hidden"></em></button>
+  </div>
+
+  <div id="toasts"></div>
+  <div id="banner" class="hidden"></div>
+  <div id="goalpop" class="hidden"></div>
+
+  <div id="sheet" class="hidden">
+    <div class="backdrop"></div>
+    <div class="panel">
+      <div class="ph"><div class="pt" id="sheetTitle"></div><button class="close" id="sheetClose" aria-label="Close">✕</button></div>
+      <div class="pb" id="sheetBody"></div>
+    </div>
+  </div>
+
+  <div id="modal" class="hidden"><div class="mcard" id="modalCard"></div></div>
+
+  <div id="tutorial" class="hidden">
+    <div class="tcard">
+      <div class="thand" id="tHand">👆</div>
+      <div class="ttitle" id="tTitle"></div>
+      <div class="ttxt" id="tTxt"></div>
+      <div class="tdots" id="tDots"></div>
+      <button class="btn big" id="tut-next">Next</button>
+      <button class="skip" id="tut-skip">Skip</button>
+    </div>
+  </div>
+</div>
+
+<div id="rotate"><div class="rcard"><div class="rph">📱</div><b>Please rotate your phone</b><span>Hearthcrawler plays in portrait mode</span></div></div>
+
+<script src="js/data.js"></script>
+<script src="js/state.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/world.js"></script>
+<script src="js/caravan.js"></script>
+<script src="js/entities.js"></script>
+<script src="js/quests.js"></script>
+<script src="js/render.js"></script>
+<script src="js/input.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+}
+</script>
+</body>
+</html>
