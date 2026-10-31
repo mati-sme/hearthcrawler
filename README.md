@@ -22,7 +22,7 @@ Play: https://mati-sme.github.io/hearthcrawler/
 - World map: Meadow → Pine Forest → Rocky Badlands → Scrap Wastes → Frost Peaks → Ember Volcano → endless Far Roads. Animated travel with roadside events.
 - 3 bosses with telegraphed attacks: Big Boar King, Raider Warlord (war-wagon), Ember Golem.
 - XP, levels with 1-of-3 perks, achievements with stars, caravan paints and flags, lucky crates, treasure chests, combos.
-- Goal-complete and level-up notices are small, queued, non-blocking toasts; an edge icon with distance always points back to the caravan; modules can be removed (60% refund) so a full chassis never blocks a goal.
+- Toasts, banners and goal-complete cards share one stacked notice queue (never overlapping); the boss HP bar sits above the resource strip; an edge icon with distance always points back to the caravan; modules can be removed (60% refund) so a full chassis never blocks a goal.
 - Never stuck: nodes respawn, death only costs 20% of carried items, gentle cost curves, hints for missing resources.
 - Autosave to localStorage (`hearthcrawler-save-v1`), service worker for offline play.
 

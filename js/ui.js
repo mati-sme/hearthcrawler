@@ -3,7 +3,7 @@
   const HC = window.HC, R = HC.R, W = HC.W;
   const $ = (id) => document.getElementById(id);
   let cur = null, tab = 'bag', selSlot = -1, perkList = null, tradeOffers = null, modalOpen = false, tutOpen = false, tutStep = 0;
-  let bannerT = 0, goalT = 0, perkDelay = 0, hudAcc = 0;
+  let perkDelay = 0, hudAcc = 0;
   const cache = {};
   const S = () => HC.S;
 
@@ -23,38 +23,38 @@
   }
 
   // =====================================================================
-  // toasts / banners / goal popup
+  // notices: toasts, banners and goal-complete cards share one stack, so they can never overlap
   // =====================================================================
-  HC.toast = function (msg) {
-    const box = $('toasts'), el = document.createElement('div');
-    el.className = 'toast'; el.textContent = msg; box.appendChild(el);
-    while (box.children.length > 2) box.removeChild(box.firstChild);
-    setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 2000);
-  };
-  HC.banner = function (t, s) {
-    const b = $('banner');
-    b.innerHTML = `<b>${t}</b><small>${s || ''}</small>`;
-    b.classList.remove('hidden'); b.style.animation = 'none'; void b.offsetWidth; b.style.animation = '';
-    bannerT = 2.8;
-  };
-  // goal-complete toasts queue up one at a time: compact, non-blocking, just below the goal card
-  const goalQ = [];
-  function hideGoalPop() {
-    const gp = $('goalpop'); if (gp.classList.contains('hidden')) return;
-    gp.classList.add('out'); goalT = 0;
-    setTimeout(() => { gp.classList.add('hidden'); gp.classList.remove('out'); showNextGoal(); }, 260);
+  const MAX_NOTICES = 3;
+  const shown = [], pending = [];
+  function pumpNotices() {
+    const box = $('notices');
+    while (shown.length < MAX_NOTICES && pending.length) {
+      const n = pending.shift(), el = document.createElement('div');
+      el.className = 'notice ' + n.kind; el.innerHTML = n.html;
+      box.appendChild(el);
+      shown.push({ el, ttl: n.ttl, kind: n.kind });
+    }
   }
-  function showNextGoal() {
-    const gp = $('goalpop');
-    if (!goalQ.length || !gp.classList.contains('hidden')) return;
-    const q = goalQ.shift();
-    gp.innerHTML = `<div class="gstar">${HC.ico('star')}</div><div class="gpm"><div class="gp1">Goal complete!</div><div class="gp3">${rewardChips(q.rew)}</div></div>`;
-    gp.classList.remove('hidden', 'out'); gp.style.animation = 'none'; void gp.offsetWidth; gp.style.animation = '';
-    goalT = 1.8;
+  function dropNotice(n) {
+    const i = shown.indexOf(n); if (i < 0) return;
+    shown.splice(i, 1); n.el.classList.add('out');
+    setTimeout(() => { if (n.el.parentNode) n.el.parentNode.removeChild(n.el); }, 260);
+    pumpNotices();
   }
+  function notify(kind, html, ttl) {
+    const dup = pending.findIndex((p) => p.kind === kind && p.html === html);
+    if (dup >= 0) return;
+    // a backlog of chatter is stale news: drop the oldest queued toasts first
+    if (kind === 'toast') while (pending.filter((p) => p.kind === 'toast').length >= 2) pending.splice(pending.findIndex((p) => p.kind === 'toast'), 1);
+    pending.push({ kind, html, ttl });
+    pumpNotices();
+  }
+  HC.toast = (msg) => notify('toast', msg.replace(/&/g, '&amp;').replace(/</g, '&lt;'), 2);
+  HC.banner = (t, s) => notify('banner', `<b>${t}</b><small>${s || ''}</small>`, 2.6);
+  const goalShowing = () => shown.some((n) => n.kind === 'goal') || pending.some((n) => n.kind === 'goal');
   function goalDone(q) {
-    goalQ.push(q); if (goalQ.length > 4) goalQ.shift();
-    showNextGoal();
+    notify('goal', `<div class="gstar">${HC.ico('star')}</div><div class="gpm"><div class="gp1">Goal complete!</div><div class="gp3">${rewardChips(q.rew)}</div></div>`, 2.2);
     HC.audio.play('fanfare');
     HC.fx.confetti(110);
     HC.fx.confettiBurst(HC.view.cw / 2, HC.view.ch * 0.2, 50);
@@ -100,8 +100,7 @@
 
   function update(dt) {
     // timers for transient UI
-    if (bannerT > 0) { bannerT -= dt; if (bannerT <= 0) $('banner').classList.add('hidden'); }
-    if (goalT > 0) { goalT -= dt; if (goalT <= 0) hideGoalPop(); }
+    for (const n of shown.slice()) { n.ttl -= dt; if (n.ttl <= 0) dropNotice(n); }
     $('app').classList.toggle('travel', !!HC.T.on);
     hudAcc += dt; if (hudAcc < 0.1) return; hudAcc = 0;
     const s = S(), P = R.P;
@@ -165,7 +164,7 @@
     const pb = $('perkbadge');
     pb.classList.toggle('hidden', !(s.pendingPerks > 0) || !!cur || HC.T.on);
     setTxt(pb, 'pbt', '⭐ Level ' + s.lvl + '! Pick a perk');
-    if (s.pendingPerks > 0 && !cur && !modalOpen && !tutOpen && !HC.T.on && goalT <= 0 && HC.nearestMobDist(300) < 0) {
+    if (s.pendingPerks > 0 && !cur && !modalOpen && !tutOpen && !HC.T.on && !goalShowing() && HC.nearestMobDist(300) < 0) {
       perkDelay += 0.1; if (perkDelay > 2.0) { perkDelay = 0; openPerks(); }
     } else perkDelay = 0;
   }
@@ -416,7 +415,7 @@
     $('action').addEventListener('pointerdown', (e) => { e.preventDefault(); HC.audio.init(); HC.ui.doAction(); });
     $('tut-next').addEventListener('click', () => { HC.audio.init(); HC.audio.play('click'); if (tutStep >= TUT.length - 1) endTutorial(); else { tutStep++; renderTut(); } });
     $('tut-skip').addEventListener('click', endTutorial);
-    $('goalpop').addEventListener('click', hideGoalPop);
+    $('notices').addEventListener('click', (e) => { const el = e.target.closest('.notice'); const n = shown.find((x) => x.el === el); if (n) dropNotice(n); });
     $('perkbadge').addEventListener('click', () => { if (!HC.ui.paused() && S().pendingPerks > 0) openPerks(); });
     if (!S().set.tutDone) startTutorial();
   };

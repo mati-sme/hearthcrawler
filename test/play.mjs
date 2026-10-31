@@ -185,7 +185,18 @@ try {
   // ---- more quests: drive the chain to see progress ----
   await S(() => { __HC.giveAll(400); });
   const qBefore = await S(() => __HC.questIndex());
-  await S((t) => window.__bot(4000, () => __HC.questIndex() >= t), qBefore + 2);
+  // like a player would: build goals are met by building (demolishing a spare module if the chassis is full), the rest by walking and fighting
+  for (let round = 0; round < 6 && (await S(() => __HC.questIndex())) < qBefore + 2; round++) {
+    await S((t) => {
+      const H = __HC.api, q = H.curQuest(), sl = __HC.state.grid.slots;
+      if (q.t === 'build' && !H.modLevel(q.a)) {
+        let i = sl.findIndex((m, k) => !m && H.slotValid(k));
+        if (i < 0) { i = sl.findIndex((m) => m && m.m === 'furnace'); H.demolishMod(i); }
+        H.buildMod(i, q.a);
+      }
+      window.__bot(1500, () => __HC.questIndex() >= t);
+    }, qBefore + 2);
+  }
   const qAfter = await S(() => __HC.questIndex());
   check('quest chain keeps advancing', qAfter > qBefore, `q ${qBefore} -> ${qAfter}`);
 

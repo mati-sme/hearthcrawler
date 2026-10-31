@@ -54,7 +54,7 @@ button:disabled { cursor: default; }
 .rchip { font-size: 11px; font-weight: 900; background: rgba(255,255,255,.7); border-radius: 9px; padding: 1px 6px; white-space: nowrap; }
 .rchip .ic { width: 14px; height: 14px; vertical-align: -3px; }
 
-#boss { position: relative; margin: 6px auto 0; width: 76%; background: var(--pill); border-radius: 12px; padding: 4px 10px 6px; color: #fff; text-align: center; font-size: 12px; }
+#boss { position: absolute; left: calc(var(--sal) + 10px); right: calc(var(--sar) + 108px); bottom: calc(var(--sab) + 52px); background: rgba(46, 32, 24, .78); border-radius: 12px; padding: 4px 10px 6px; color: #fff; text-align: center; font-size: 13px; font-weight: 900; line-height: 1.2; }
 #boss .track { height: 12px; margin-top: 3px; }
 #boss .fill { background: linear-gradient(#ff8a7a, #e8403a); }
 
@@ -79,22 +79,21 @@ button:disabled { cursor: default; }
 #action.cd { filter: grayscale(.7) brightness(.85); }
 #action.go { animation: btnPulse 1s infinite; }
 
-#toasts { position: absolute; left: 0; right: 0; top: calc(var(--gbot, 112px) + 108px); z-index: 6; display: flex; flex-direction: column; align-items: center; gap: 5px; pointer-events: none; padding-right: 70px; padding-left: 10px; }
-.toast { background: rgba(40, 28, 20, .82); color: #fff; font-weight: 800; font-size: 12.5px; padding: 5px 12px; border-radius: 14px; animation: toastIn .25s, toastOut .3s 1.7s forwards; max-width: 100%; text-align: center; }
-
-#banner { position: absolute; left: 50%; top: calc(var(--gbot, 112px) + 150px); transform: translateX(-50%); z-index: 7; pointer-events: none; text-align: center; background: linear-gradient(#fff9ea, #ffe7b8); border: 3px solid #fff; border-radius: 16px; padding: 5px 14px; box-shadow: 0 3px 0 #c9a46a, 0 8px 18px rgba(0,0,0,.3); animation: bannerIn .35s cubic-bezier(.3,1.6,.5,1), bannerOut .35s 2.2s forwards; max-width: 82%; }
-#banner b { display: block; font-size: 15px; font-weight: 900; color: var(--brown); }
-#banner small { display: block; font-size: 11px; font-weight: 800; color: #b0662a; }
-
-#goalpop { position: absolute; left: 50%; top: calc(var(--gbot, 112px) + 6px); transform: translateX(-50%); z-index: 9; display: flex; align-items: center; gap: 8px; max-width: 86%; max-height: 62px; background: linear-gradient(#fffbee, #ffe2a8); border: 3px solid #fff; border-radius: 20px; padding: 5px 14px 5px 10px; box-shadow: 0 3px 0 #c9a46a, 0 8px 18px rgba(0,0,0,.35); animation: goalIn .3s cubic-bezier(.3,1.7,.5,1); pointer-events: none; }
-#goalpop.out { animation: goalOut .26s forwards; }
-#goalpop .gp1 { font-size: 12px; font-weight: 900; letter-spacing: 1px; color: #d9701a; text-transform: uppercase; }
-#goalpop .gp3 { display: flex; flex-wrap: wrap; gap: 4px; }
-#goalpop .rchip { font-size: 12px; padding: 1px 7px; background: #fff; box-shadow: 0 1px 0 rgba(0,0,0,.12); }
-#goalpop .rchip .ic { width: 15px; height: 15px; vertical-align: -3px; }
-#goalpop .gstar { font-size: 30px; line-height: 1; animation: spin 1s ease-out; display: inline-block; }
-#goalpop .gstar img, #goalpop .gstar .ic { width: 30px; height: 30px; }
-#perkbadge { position: absolute; left: 10px; top: calc(var(--gbot, 112px) + 70px); z-index: 8; background: linear-gradient(#ffe68a, #ffc23a); color: #5a3510; font-weight: 900; font-size: 13px; padding: 6px 12px; border-radius: 16px; border: 3px solid #fff; box-shadow: 0 3px 0 #c98f1a, 0 6px 12px rgba(0,0,0,.3); animation: pulseBadge 1s infinite; cursor: pointer; }
+#notices { position: absolute; left: 0; right: 0; top: calc(var(--gbot, 112px) + 8px); z-index: 9; display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none; padding: 0 70px 0 10px; }
+#notices .notice { animation: noticeIn .3s cubic-bezier(.3,1.5,.5,1); max-width: 100%; text-align: center; }
+#notices .notice.out { animation: noticeOut .25s forwards; }
+.notice.toast { background: rgba(40, 28, 20, .85); color: #fff; font-weight: 800; font-size: 12.5px; padding: 5px 12px; border-radius: 14px; }
+.notice.banner { background: linear-gradient(#fff9ea, #ffe7b8); border: 3px solid #fff; border-radius: 16px; padding: 5px 14px; box-shadow: 0 3px 0 #c9a46a, 0 8px 18px rgba(0,0,0,.3); }
+.notice.banner b { display: block; font-size: 15px; font-weight: 900; color: var(--brown); }
+.notice.banner small { display: block; font-size: 11px; font-weight: 800; color: #b0662a; }
+.notice.goal { display: flex; align-items: center; gap: 8px; background: linear-gradient(#fffbee, #ffe2a8); border: 3px solid #fff; border-radius: 20px; padding: 5px 14px 5px 10px; box-shadow: 0 3px 0 #c9a46a, 0 8px 18px rgba(0,0,0,.35); text-align: left; }
+.notice.goal .gp1 { font-size: 12px; font-weight: 900; letter-spacing: 1px; color: #d9701a; text-transform: uppercase; }
+.notice.goal .gp3 { display: flex; flex-wrap: wrap; gap: 4px; }
+.notice.goal .rchip { font-size: 12px; padding: 1px 7px; background: #fff; box-shadow: 0 1px 0 rgba(0,0,0,.12); }
+.notice.goal .rchip .ic { width: 15px; height: 15px; vertical-align: -3px; }
+.notice.goal .gstar { font-size: 30px; line-height: 1; animation: spin 1s ease-out; display: inline-block; }
+.notice.goal .gstar img, .notice.goal .gstar .ic { width: 30px; height: 30px; }
+#perkbadge { position: absolute; left: 10px; bottom: calc(var(--sab) + 104px); z-index: 8; background: linear-gradient(#ffe68a, #ffc23a); color: #5a3510; font-weight: 900; font-size: 13px; padding: 6px 12px; border-radius: 16px; border: 3px solid #fff; box-shadow: 0 3px 0 #c98f1a, 0 6px 12px rgba(0,0,0,.3); animation: pulseBadge 1s infinite; cursor: pointer; }
 @keyframes pulseBadge { 50% { transform: scale(1.08); } }
 
 /* ---- sheets ---- */
@@ -216,12 +215,8 @@ button:disabled { cursor: default; }
 
 @keyframes fade { from { opacity: 0 } to { opacity: 1 } }
 @keyframes sheetUp { from { transform: translateY(100%) } to { transform: none } }
-@keyframes toastIn { from { transform: translateY(-8px) scale(.9); opacity: 0 } to { transform: none; opacity: 1 } }
-@keyframes toastOut { to { opacity: 0; transform: translateY(-6px) } }
-@keyframes bannerIn { from { transform: translateX(-50%) scale(.6); opacity: 0 } to { transform: translateX(-50%) scale(1); opacity: 1 } }
-@keyframes bannerOut { to { opacity: 0; transform: translateX(-50%) translateY(-10px) } }
-@keyframes goalIn { from { transform: translate(-50%, -14px) scale(.6); opacity: 0 } to { transform: translate(-50%, 0) scale(1); opacity: 1 } }
-@keyframes goalOut { to { transform: translate(-50%, -14px) scale(.8); opacity: 0 } }
+@keyframes noticeIn { from { transform: translateY(-10px) scale(.7); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes noticeOut { to { opacity: 0; transform: translateY(-8px) scale(.9) } }
 @keyframes mcIn { from { transform: scale(.4); opacity: 0 } to { transform: scale(1); opacity: 1 } }
 @keyframes goalPop { 0% { transform: scale(.85) } 60% { transform: scale(1.06) } 100% { transform: scale(1) } }
 @keyframes btnPulse { 0%, 100% { transform: scale(1) } 50% { transform: scale(1.12) } }
@@ -233,4 +228,4 @@ button:disabled { cursor: default; }
 @keyframes handDrag { 0% { transform: translate(-40px, 20px) } 50% { transform: translate(40px, -6px) } 100% { transform: translate(-40px, 20px) } }
 #hpTxt { flex: 0 0 auto; overflow: visible; text-overflow: clip; min-width: 24px; text-align: right; }
 .pill.bar .track { min-width: 14px; }
-#app.travel #hud, #app.travel #toasts, #app.travel #banner, #app.travel #goalpop, #app.travel #perkbadge, #app.travel #joyPad { visibility: hidden; }
+#app.travel #hud, #app.travel #notices, #app.travel #perkbadge, #app.travel #joyPad { visibility: hidden; }
