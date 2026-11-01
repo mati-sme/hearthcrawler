@@ -154,9 +154,7 @@ export class Enemies {
         const to = new THREE.Vector3(tgt.x, tgt.y + 0.8, tgt.z);
         const dist = mz.distanceTo(to), tt = dist / 80;
         this.fx.tracer(mz, to, m.lv >= 4 ? 0x6fe0d0 : 0xffd27a);
-        const dirx = (to.x - mz.x) / dist, diry = (to.y - mz.y) / dist, dirz = (to.z - mz.z) / dist;
-        this.fx.spawn(1, mz.x, mz.y, mz.z, dirx * 80, diry * 80, dirz * 80, 0.3, tt + 0.02, 0, 0xffffff);
-        this.fx.sparkle(mz.x, mz.y, mz.z, 0xffd27a, 4, 2);
+        this.fx.sparkle(mz.x, mz.y, mz.z, 0xffd27a, 3, 2, 0.3);
         this.pending.push({ t: tt, e: tgt, dmg: TURRET.dmg[lv] * (1 + 0.05 * state.beast), from: p.clone() });
         ctx.sfx && ctx.sfx('turret');
         ctx.turretFired && ctx.turretFired(+k);

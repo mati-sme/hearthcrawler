@@ -63,7 +63,7 @@ sw.js, manifest.webmanifest, icons/
 - Save: `localStorage['hearthcrawler-save-v2']`, autosave every ~10 s and on `visibilitychange`. A corrupt save falls back to a fresh
   game. If `hearthcrawler-save-v1` exists the old save is never parsed: a Welcome card grants a starter bundle (resources + stone
   toolset) once.
-- Service worker: cache `hearthcrawler-v2.0.0` (`VERSION` at the top of `sw.js`; bump it every release). Network-first for HTML,
+- Service worker: cache `hearthcrawler-v2.0.1` (`VERSION` at the top of `sw.js`; bump it every release). Network-first for HTML,
   stale-while-revalidate for js/css/vendor/icons, old `hearthcrawler-` caches deleted on activate, the page reloads once when a
   new worker takes control.
 - Test hooks: `window.__HC = { version, state, runtime, step(dt, n), giveAll(), setTime(0..1), spawnNight(), travel(), teleport(x, z), look(yaw, pitch), ... }`.

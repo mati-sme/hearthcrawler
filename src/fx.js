@@ -13,7 +13,7 @@ export function glowSprite(tex, hex, size) {
   s.scale.setScalar(size); return s;
 }
 
-const M = new THREE.Matrix4(), Q = new THREE.Quaternion(), V = new THREE.Vector3(), S = new THREE.Vector3(), C = new THREE.Color(), E = new THREE.Euler();
+const UPZ = new THREE.Vector3(0, 0, 1), M = new THREE.Matrix4(), Q = new THREE.Quaternion(), V = new THREE.Vector3(), S = new THREE.Vector3(), C = new THREE.Color(), E = new THREE.Euler();
 
 export class FX {
   constructor(scene, layer) {
@@ -23,6 +23,14 @@ export class FX {
     this.glows = new THREE.InstancedMesh(new THREE.OctahedronGeometry(1, 0), new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }), CAP);
     for (const m of [this.chunks, this.glows]) { m.frustumCulled = false; m.count = 0; m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); m.setColorAt(0, C.set(0xffffff)); scene.add(m); }
     this.chunks.castShadow = false;
+    // round dust puffs (opaque, swell then shrink)
+    this.pcap = 160;
+    this.puffs = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 1), new THREE.MeshLambertMaterial({ emissive: 0x3a3226 }), this.pcap);
+    this.puffs.frustumCulled = false; this.puffs.count = 0; this.puffs.instanceMatrix.setUsage(THREE.DynamicDrawUsage); this.puffs.setColorAt(0, C.set(0xffffff)); this.puffs.castShadow = false; scene.add(this.puffs);
+    // thin glowing tracer bolts: stretched additive boxes flying along their direction
+    this.bolts = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }), 96);
+    this.bolts.frustumCulled = false; this.bolts.count = 0; this.bolts.instanceMatrix.setUsage(THREE.DynamicDrawUsage); this.bolts.setColorAt(0, C.set(0xffffff)); scene.add(this.bolts);
+    this.bs = Array.from({ length: 48 }, () => ({ on: false }));
     this.ps = Array.from({ length: CAP * 2 }, () => ({ on: false }));
     this.next = 0;
     this.layer = layer;
@@ -47,10 +55,10 @@ export class FX {
       this.spawn(0, x, y, z, Math.cos(a) * speed * 0.6 * Math.random(), up, Math.sin(a) * speed * 0.6 * Math.random(), size * (0.6 + Math.random() * 0.8), 0.7 + Math.random() * 0.4, 14, hex);
     }
   }
-  sparkle(x, y, z, hex, n = 8, speed = 3) {
+  sparkle(x, y, z, hex, n = 8, speed = 3, k = 1) {
     for (let i = 0; i < n; i++) {
       const a = Math.random() * 6.28, e = (Math.random() - 0.3) * 2;
-      this.spawn(1, x, y, z, Math.cos(a) * speed * Math.random(), e * speed * 0.6 + 1, Math.sin(a) * speed * Math.random(), 0.1 + Math.random() * 0.1, 0.5 + Math.random() * 0.5, -1.5, hex);
+      this.spawn(1, x, y, z, Math.cos(a) * speed * Math.random(), e * speed * 0.6 + 1, Math.sin(a) * speed * Math.random(), (0.1 + Math.random() * 0.1) * k, 0.5 + Math.random() * 0.5, -1.5, hex);
     }
   }
   poof(x, y, z, hex) {
@@ -58,12 +66,19 @@ export class FX {
     this.sparkle(x, y + 0.6, z, hex, 12, 4); this.sparkle(x, y + 0.6, z, 0xffffff, 6, 3);
   }
   smoke(x, y, z) { this.spawn(1, x, y, z, (Math.random() - 0.5) * 0.4, 1.0, (Math.random() - 0.5) * 0.4, 0.22, 1.2, -0.3, 0x55606e, 1.8); }
+  // kicked-up dust at a footfall (pooled lit chunks that swell and drift up while fading out)
+  dust(x, y, z, back = 1) {
+    for (let i = 0; i < 5; i++) {
+      const p = this.spawn(2, x + (Math.random() - 0.5) * 2.0, y + 0.35, z + 0.8 + i * 0.45, (Math.random() - 0.5) * 1.4, 0.5 + Math.random() * 0.9, back * (2 + Math.random() * 2.5), 0.4 + Math.random() * 0.3, 1.1 + Math.random() * 0.5, -0.4, i % 2 ? 0xf2e4bc : 0xe0cb98, 2.4);
+      if (p) p.dust = true;
+    }
+  }
   tracer(a, b, hex) {
-    const n = 12;
-    for (let i = 0; i < n; i++) { const f = i / (n - 1); this.spawn(1, a.x + (b.x - a.x) * f, a.y + (b.y - a.y) * f, a.z + (b.z - a.z) * f, 0, 0, 0, 0.11, 0.3 + 0.25 * (1 - f), 0, hex); }
+    const d = V.copy(b).sub(a), len = d.length(); if (len < 0.5) return;
+    for (const q of this.bs) if (!q.on) { Object.assign(q, { on: true, x: a.x, y: a.y, z: a.z, dx: d.x / len, dy: d.y / len, dz: d.z / len, left: len, hex }); return; }
   }
   update(dt) {
-    let ci = 0, gi = 0;
+    let ci = 0, gi = 0, pi = 0;
     for (const p of this.ps) {
       if (!p.on) continue;
       p.life -= dt;
@@ -74,16 +89,31 @@ export class FX {
       p.rot += p.spin * dt;
       const f = p.life / p.max;
       const sz = p.size * (p.grow ? (1 + p.grow * (1 - f)) * Math.min(1, f * 2.2 + 0.2) : Math.min(1, f * 2.5));
-      const m = p.kind === 0 ? this.chunks : this.glows;
-      const i = p.kind === 0 ? ci++ : gi++;
+      if (p.kind === 2 && pi >= this.pcap) continue;
+      const m = p.kind === 0 ? this.chunks : p.kind === 2 ? this.puffs : this.glows;
+      const i = p.kind === 0 ? ci++ : p.kind === 2 ? pi++ : gi++;
       Q.setFromEuler(E.set(p.rot, p.rot * 0.7, 0));
       M.compose(V.set(p.x, p.y, p.z), Q, S.setScalar(sz));
       m.setMatrixAt(i, M);
       C.setRGB(p.r, p.g, p.b); if (p.kind === 1) C.multiplyScalar(0.6 + 0.4 * f);
       m.setColorAt(i, C);
     }
-    this.chunks.count = ci; this.glows.count = gi;
-    for (const m of [this.chunks, this.glows]) { m.instanceMatrix.needsUpdate = true; if (m.instanceColor) m.instanceColor.needsUpdate = true; }
+    this.chunks.count = ci; this.glows.count = gi; this.puffs.count = pi;
+    // bolts: 80 m/s, a 1.5 m yellow sheath around a thin white core
+    let bi = 0;
+    for (const q of this.bs) {
+      if (!q.on) continue;
+      const mv = Math.min(q.left, 80 * dt); q.x += q.dx * mv; q.y += q.dy * mv; q.z += q.dz * mv; q.left -= mv;
+      if (q.left <= 0.01) { q.on = false; continue; }
+      const len = Math.min(1.5, q.left + 0.4);
+      Q.setFromUnitVectors(UPZ, V.set(q.dx, q.dy, q.dz));
+      for (const [w, l, col] of [[0.07, len, q.hex], [0.03, len * 0.8, 0xffffff]]) {
+        M.compose(S.set(q.x - q.dx * len * 0.5, q.y - q.dy * len * 0.5, q.z - q.dz * len * 0.5), Q, V.set(w, w, l));
+        this.bolts.setMatrixAt(bi, M); this.bolts.setColorAt(bi, C.set(col)); bi++;
+      }
+    }
+    this.bolts.count = bi; this.bolts.instanceMatrix.needsUpdate = true; if (this.bolts.instanceColor) this.bolts.instanceColor.needsUpdate = true;
+    for (const m of [this.chunks, this.glows, this.puffs]) { m.instanceMatrix.needsUpdate = true; if (m.instanceColor) m.instanceColor.needsUpdate = true; }
   }
   popup(x, y, z, text, cls = '') {
     const p = this.pops[this.pi++ % this.pops.length];

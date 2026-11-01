@@ -43,14 +43,14 @@ canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block}
 #b-attack svg{font-size:30px;color:var(--ember)}
 #b-jump{right:112px;bottom:14px;width:56px;height:56px}
 #b-interact{right:104px;bottom:80px;background:var(--ice)}
-#b-interact.dis{opacity:.4}
+#b-interact.dis{background:var(--line)}#b-interact.dis>*{opacity:.45}
 #b-interact::before{background:rgba(6,30,28,.78)}
 #b-build{right:14px;bottom:110px;width:56px;height:56px}
 #b-build.on{background:var(--ember)}
 #b-build.on svg{color:var(--ember)}
 /* crosshair */
 #cross{position:absolute;left:50%;top:50%;width:0;height:0}
-#cross>i{position:absolute;left:-2.5px;top:-2.5px;width:5px;height:5px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.6),0 0 6px rgba(111,224,208,.8);transform:rotate(45deg);transition:all .12s}
+#cross>i{position:absolute;left:-2.5px;top:-2.5px;width:5px;height:5px;background:#fff;box-shadow:0 0 0 1.5px rgba(0,0,0,.85),0 0 6px rgba(0,0,0,.5);transform:rotate(45deg);transition:all .12s}
 #cross.hot>i{width:0;height:0;opacity:0}
 #cross-ic{position:absolute;left:-14px;top:-14px;width:28px;height:28px;font-size:26px;color:var(--ice);display:none;filter:drop-shadow(0 0 4px #000)}
 #cross.hot #cross-ic{display:block}
@@ -58,7 +58,8 @@ canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block}
 #cross-lbl{position:absolute;top:20px;left:-90px;width:180px;text-align:center;font-size:11px;font-weight:700;text-shadow:0 1px 3px #000,0 0 6px #000;letter-spacing:.1em;white-space:nowrap}
 #cross-lbl small{display:block;font-size:9px;color:var(--ice);font-weight:400}
 /* stats */
-#stats{position:absolute;left:10px;bottom:10px;width:162px;pointer-events:none;filter:drop-shadow(0 1px 4px rgba(0,0,0,.7))}
+#stats{left:8px;bottom:8px;width:178px;pointer-events:none}
+#stats .in{padding:5px 10px 6px}
 #stats .xp{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--ice);margin-bottom:5px}
 #stats .xp .bar{flex:1;margin:0;height:3px}
 #stats .row{display:flex;align-items:center;gap:6px;margin-top:3px;pointer-events:auto}
@@ -78,7 +79,7 @@ canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block}
 .slot b{position:absolute;left:5px;top:2px;font-size:9px;color:var(--dim)}
 .slot em{position:absolute;right:5px;bottom:3px;font-style:normal;font-size:8px;color:var(--ice);letter-spacing:.05em}
 .slot.sel{background:var(--ice)}.slot.sel::before{background:rgba(8,36,34,.86)}.slot.sel{color:var(--ice);filter:drop-shadow(0 0 6px rgba(111,224,208,.6))}
-.slot.lock{opacity:.4}
+.slot.lock>*{opacity:.4}
 /* boss */
 #boss{left:50%;bottom:62px;width:220px;margin-left:-110px}
 #boss .in{padding:4px 10px}
@@ -114,8 +115,8 @@ canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block}
 #fade{position:absolute;inset:0;background:#02060a;opacity:0;transition:opacity .5s}
 #fade.on{opacity:1}
 /* joystick */
-#joy{position:fixed;display:none;z-index:2;width:108px;height:108px;margin:-54px 0 0 -54px;border:1px solid rgba(190,235,230,.35);border-radius:50%;pointer-events:none;background:radial-gradient(rgba(111,224,208,.08),transparent 70%)}
-#joyknob{position:absolute;left:50%;top:50%;width:40px;height:40px;transform:translate(-50%,-50%);background:rgba(111,224,208,.35);border:1px solid var(--ice);clip-path:polygon(25% 0,75% 0,100% 25%,100% 75%,75% 100%,25% 100%,0 75%,0 25%)}
+#joy{position:fixed;display:none;z-index:2;width:108px;height:108px;margin:-54px 0 0 -54px;border:2px solid rgba(9,15,19,.7);box-shadow:0 0 0 1px rgba(190,235,230,.5),inset 0 0 0 1px rgba(190,235,230,.3);border-radius:50%;pointer-events:none;background:radial-gradient(rgba(9,15,19,.3),rgba(9,15,19,.1) 70%)}
+#joyknob{position:absolute;left:50%;top:50%;width:40px;height:40px;transform:translate(-50%,-50%);background:rgba(9,15,19,.7);border:1px solid var(--ice);clip-path:polygon(25% 0,75% 0,100% 25%,100% 75%,75% 100%,25% 100%,0 75%,0 25%)}
 /* panel / modal */
 #panel,#modal{position:fixed;inset:0;z-index:20;background:rgba(3,7,10,.62);display:flex;align-items:center;justify-content:center;padding:max(10px,env(safe-area-inset-top)) 28px 10px}
 #modal{z-index:30;background:rgba(3,7,10,.72)}

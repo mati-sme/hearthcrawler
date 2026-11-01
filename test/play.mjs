@@ -51,7 +51,7 @@ const shot = async (name) => { await settle(); await page.screenshot({ path: pat
 const box = async (sel) => { const b = await page.locator(sel).boundingBox(); return { x: b.x + b.width / 2, y: b.y + b.height / 2 }; };
 
 console.log('boot');
-check(await hc(() => !!__HC.version && __HC.version === '2.0.0'), 'boots with version 2.0.0');
+check(await hc(() => !!__HC.version && __HC.version === '2.0.1'), 'boots with version 2.0.1');
 await hc(() => { __HC.freeze(true); __HC.setTime(0.2); __HC.state.flags.gift = true; });
 await step(0.05, 4);
 const blank = await hc(() => {
@@ -121,7 +121,7 @@ await page.tap('[data-tab="build"]'); await page.waitForTimeout(100);
 check(await hc(() => document.querySelectorAll('[data-build]').length >= 7), 'build tab lists all modules');
 await page.tap('[data-tab="caravan"]'); await page.waitForTimeout(100);
 await page.tap('[data-tab="system"]'); await page.waitForTimeout(100);
-check(await hc(() => /v2\.0\.0/i.test(document.body.innerText)), 'version 2.0.0 shown in the menu');
+check(await hc(() => /v2\.0\.1/i.test(document.body.innerText)), 'version 2.0.1 shown in the menu');
 await page.tap('[data-act="close"]'); await page.waitForTimeout(100);
 
 console.log('building on the deck');
@@ -144,6 +144,28 @@ await hc(() => {
 await step(0.05, 30);
 check(await hc(() => Object.keys(__HC.state.mods).length >= 8), 'several modules built');
 check(await hc(() => __HC.runtime.car.mods[0] && __HC.runtime.car.mods[0].group.parent !== null), 'modules appear in the 3D scene');
+// play the goal chain through the normal goal system (real actions via core rules, then a game tick) up to 'Defeat 6 night creatures'
+const gp = await hc(() => {
+  const s = __HC.state, C = __HC.C, D = __HC.D;
+  for (let i = 0, stuck = 0; i < 200 && s.goal < 26 && stuck < 6; i++) {
+    const g = C.goalDef(s), before = s.goal;
+    __HC.giveAll(60);
+    if (g.kind === 'gather') C.addRes(s, g.arg, g.n);
+    else if (g.kind === 'smelt') C.addRes(s, 'metal', g.n, { smelt: true });
+    else if (g.kind === 'craft') C.craft(s, g.arg);
+    else if (g.kind === 'build') { let f = -1; for (let k = 0; k < 10 && f < 0; k++) if (!s.mods[k]) f = k; if (f >= 0) __HC.placeAt(f, g.arg); __HC.exitBuild(); }
+    else if (g.kind === 'upgrade') { for (const k in s.mods) if (s.mods[k].type === g.arg) C.upgradeModule(s, +k); }
+    else if (g.kind === 'deck') C.onBoard(s);
+    else if (g.kind === 'nights') C.nightSurvived(s, s.stats.nights + 1);
+    else if (g.kind === 'level') C.gainXp(s, D.xpNeed(s.level));
+    else if (g.kind === 'kills' || g.kind === 'killsd') for (let k = 0; k < g.n; k++) C.onKill(s, 'shade');
+    __HC.step(0.05, 1);
+    stuck = s.goal === before ? stuck + 1 : 0;
+  }
+  return { goal: s.goal, text: C.goalDef(s).text, level: s.level, mods: Object.keys(s.mods).length };
+});
+check(gp.goal >= 26, `goal chain played through the normal goal system -> goal ${gp.goal + 1} '${gp.text}', level ${gp.level}`);
+await hc(() => { __HC.ui.closeModal && __HC.ui.closeModal('ok'); __HC.clearNotes(); });
 // 02-build: golden hour, ghost on a slot
 await hc(() => { __HC.setTime(0.61); __HC.select(5); __HC.runtime.player.teleport(0.2, __HC.runtime.car.cz + 4.3, __HC.runtime.car); __HC.startBuild('turret'); __HC.runtime.buildType = 'turret'; __HC.runtime.manualSlot = performance.now() + 1e7; __HC.runtime.buildSlot = 9; __HC.look(0.02, -0.17); __HC.clearNotes(); });
 await step(0.05, 12);
@@ -195,7 +217,7 @@ await hc(() => {
 });
 await hc(() => __HC.clearNotes());
 let tracer = false;
-for (let i = 0; i < 60 && !tracer; i++) { await step(0.016, 1); tracer = await hc(() => __HC.runtime.shots > 0 && __HC.runtime.fx.glows.count > 10); }
+for (let i = 0; i < 60 && !tracer; i++) { await step(0.016, 1); tracer = await hc(() => __HC.runtime.shots > 0 && __HC.runtime.fx.bolts.count >= 2); }
 await hc(() => { for (const f of __HC.runtime.enemies.list) if (f.alive) f.cd = 99; });
 await hc(() => { window.__hit.flash = 0.16; window.__hit.body.material.emissiveIntensity = 0.85; __HC.clearNotes(); __HC.runtime.fx.popup(window.__hit.x, window.__hit.y + 2.1, window.__hit.z, '18', 'dmg'); });
 await shot('03-night-combat.png');
@@ -209,8 +231,10 @@ await step(0.05, 6);
 const cz0 = await hc(() => __HC.runtime.car.cz);
 check(await hc(() => __HC.travel()), 'travel starts when supplies are ready');
 await step(0.05, 300);
-await hc(() => { __HC.clearNotes(); __HC.cam([10.5, 3.4, __HC.runtime.car.cz - 13.5], [0, 3.0, __HC.runtime.car.cz - 1.0]); });
-await step(0.016, 2);
+await hc(() => { __HC.clearNotes(); __HC.setTime(0.56); __HC.cam([-14.5, 8.6, __HC.runtime.car.cz - 6.8], [-0.3, 4.1, __HC.runtime.car.cz - 0.8]); });
+let dusty = false;
+for (let i = 0; i < 80 && !dusty; i++) { await step(0.02, 1); dusty = await hc(() => __HC.runtime.fx.ps.filter((p) => p.on && p.dust && p.life > p.max * 0.45).length >= 8); }
+check(dusty && await hc(() => !!__HC.runtime.travel), 'travelling caravan kicks up pooled dust puffs behind its feet');
 await shot('04-caravan-moving.png');
 await hc(() => __HC.cam(null));
 await step(0.05, 520);
@@ -239,7 +263,7 @@ check(before === after, `progress restored after reload ${after}`);
 
 console.log('service worker');
 const sw = await hc(async () => { const r = await navigator.serviceWorker.ready; return { active: !!r.active, keys: await caches.keys() }; });
-check(sw.active && sw.keys.includes('hearthcrawler-v2.0.0'), `service worker registered, cache ${sw.keys.join(',')}`);
+check(sw.active && sw.keys.includes('hearthcrawler-v2.0.1'), `service worker registered, cache ${sw.keys.join(',')}`);
 await ctx.close();
 
 console.log('old v1 save -> gift card');

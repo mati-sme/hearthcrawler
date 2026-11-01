@@ -456,6 +456,7 @@ function update(dt) {
   if (R.fade === 0) player.update(dt, inp, { car, world, state, onJump: () => Audio.sfx.jump() });
   state.cz = car.cz;
   car.update(dt, R.t, v);
+  for (const [fx0, fz0] of car.steps) { const wx = fx0 * 1.05, wz = car.cz + fz0; fx.dust(wx, terrainH(wx, wz), wz); }
   // actions
   R.target = ui.isOpen() ? null : findTarget();
   R.interact = interactFor(R.target);

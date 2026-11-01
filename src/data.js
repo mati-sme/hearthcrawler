@@ -1,5 +1,5 @@
 // Pure data tables (no DOM, no three) so the balance sim can import them in node.
-export const VERSION = '2.0.0';
+export const VERSION = '2.0.1';
 export const DAY_SEC = 240;
 export const NIGHT_SEC = 120;
 export const CYCLE = DAY_SEC + NIGHT_SEC;

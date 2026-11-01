@@ -1,5 +1,5 @@
 // Hearthcrawler service worker. Bump VERSION on every release.
-const VERSION = '2.0.0';
+const VERSION = '2.0.1';
 const CACHE = 'hearthcrawler-v' + VERSION;
 const FILES = [
   './', 'index.html', 'manifest.webmanifest', 'css/hud.css',

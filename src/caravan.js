@@ -12,18 +12,19 @@ export class Caravan {
     this.scene = scene; this.glowTex = glowTex;
     this.root = new THREE.Group(); this.body = new THREE.Group(); this.root.add(this.body);
     scene.add(this.root);
-    const P = beastParts(), mat = lit({ emissive: 0x4a3c24, emissiveIntensity: 0.75 }), glowMat = unlit({ fog: true });
+    const P = beastParts(), mat = lit({ emissive: 0x4a3c24, emissiveIntensity: 0.75, transparent: false, opacity: 1, depthWrite: true, depthTest: true, side: THREE.FrontSide }), glowMat = unlit({ fog: true });
     this.mat = mat; this.glowMat = glowMat;
     const mk = (g, parent = this.body) => { const m = new THREE.Mesh(g, mat); m.castShadow = true; m.receiveShadow = true; parent.add(m); return m; };
     mk(P.shell); mk(P.deck);
-    this.head = new THREE.Group(); this.head.position.set(0, 3.3, -7.2); this.body.add(this.head);
-    mk(P.head, this.head); mk(P.eyes, this.head);
-    this.legs = LEGS.map(([x, z, ph]) => { const g = new THREE.Group(); g.position.set(x, 2.55, z); this.body.add(g); mk(P.leg, g); return { g, ph }; });
+    this.head = new THREE.Group(); this.head.position.set(0, 3.0, -7.0); this.body.add(this.head);
+    mk(P.head, this.head); { const e = new THREE.Mesh(P.eyes, glowMat); this.head.add(e); }
+    this.tail = new THREE.Group(); this.tail.position.set(0, 2.6, 8.0); this.body.add(this.tail); mk(P.tail, this.tail);
+    this.legs = LEGS.map(([x, z, ph]) => { const g = new THREE.Group(); g.position.set(x, 2.55, z); this.body.add(g); mk(P.leg, g); return { g, ph, c: 0 }; });
     this.deckRoot = new THREE.Group(); this.body.add(this.deckRoot);
     this.helmGem = glowSprite(glowTex, 0x6fe0d0, 1.6); this.helmGem.position.set(0, DECK.y + 1.6, -DECK.z + 0.5); this.body.add(this.helmGem);
     this.mods = {}; this.geoCache = new Map();
     this.pulse = {};
-    this.phase = 0; this.y = 0; this.cz = 0; this.speed = 0;
+    this.steps = []; this.phase = 0; this.y = 0; this.cz = 0; this.speed = 0;
     // slot rings + ghost
     this.rings = new THREE.Group(); this.rings.visible = false; this.deckRoot.add(this.rings);
     this.ringMeshes = SLOT_POS.map((p) => {
@@ -43,6 +44,12 @@ export class Caravan {
     this.speed = speed;
     const k = Math.min(1, speed / 3);
     this.phase += dt * (speed / 6.5) * Math.PI * 2;
+    this.steps.length = 0;
+    for (const L of this.legs) {
+      const c = Math.cos(this.phase + L.ph);
+      if (k > 0.4 && L.c > 0 && c <= 0) this.steps.push([L.g.position.x, L.g.position.z - 1.3]); // foot plants at the front of its stride
+      L.c = c;
+    }
     for (const L of this.legs) L.g.rotation.x = Math.sin(this.phase + L.ph) * 0.55 * k + Math.sin(t * 0.8 + L.ph) * 0.02 * (1 - k);
     const bob = Math.abs(Math.sin(this.phase)) * 0.12 * k;
     this.body.position.y = bob + Math.sin(t * 0.7) * 0.03;
@@ -50,6 +57,7 @@ export class Caravan {
     this.body.rotation.x = Math.sin(t * 0.6) * 0.004 + Math.sin(this.phase + 1) * 0.008 * k;
     this.head.rotation.x = Math.sin(this.phase + 0.6) * 0.05 * k + Math.sin(t * 0.5) * 0.03;
     this.head.rotation.y = Math.sin(t * 0.3) * 0.12 * (1 - k);
+    this.tail.rotation.y = Math.sin(this.phase * 0.5 + t * 1.3) * (0.25 + 0.2 * k); this.tail.rotation.x = Math.sin(t * 0.9) * 0.05;
     this.helmGem.material.opacity = 0.75 + Math.sin(t * 3) * 0.2;
   }
 

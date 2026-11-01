@@ -105,22 +105,44 @@ export function foeGeo(type) {
 
 // ---------- the Shellback beast. origin at ground between feet; head toward -Z
 export function beastParts() {
-  const shellH = 3.4, legH = 1.9;
+  const shellH = 3.4, legH = 1.9, top = legH + shellH;
+  // warm brown shell with orange scute plates and bone rim; moss only as small patches on top
+  const plates = [];
+  for (let r = 0; r < 2; r++) for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * PI * 2 + r * 0.26, y = legH + 0.75 + r * 1.35, k = r ? 0.9 : 1;
+    plates.push(P(cyl(0.95, 1.05, 0.5, 6), (i + r) % 2 ? 0xd98a3c : 0xc0702e, { p: [Math.cos(a) * 6.0 * k, y, Math.sin(a) * 7.9 * k], r: [Math.sin(a) * 0.6, -a, -Math.cos(a) * 0.6], s: [1.15, 1, 1.15], j: 0.1 }));
+  }
   const shell = build([
-    P(new THREE.CylinderGeometry(0.86, 1, shellH, 14, 1), 0xa08a52, { p: [0, legH + shellH / 2, 0], s: [6.2, 1, 8.2], g: 0.35, j: 0.1 }),
-    ...Array.from({ length: 12 }, (_, i) => { const a = (i / 12) * PI * 2; return P(blob(0.9, 100 + i, 0.3, 0), i % 2 ? 0x6aa458 : 0x5a9448, { p: [Math.cos(a) * 5.3, legH + 0.6 + (i % 3) * 0.5, Math.sin(a) * 7.0], s: [1.2, 0.7, 1.2] }); }),
-    ...Array.from({ length: 9 }, (_, i) => { const a = (i / 9) * PI * 2 + 0.3; return P(cone(0.12, 0.45, 4), 0x78b05a, { p: [Math.cos(a) * 5.1, legH + shellH - 0.3, Math.sin(a) * 6.8] }); }),
+    P(new THREE.CylinderGeometry(0.86, 1, shellH, 14, 1), 0x8a5230, { p: [0, legH + shellH / 2, 0], s: [6.2, 1, 8.2], g: 0.35, j: 0.08 }),
+    P(cyl(1, 1, 0.34, 18), 0xe9dcae, { p: [0, legH + 0.17, 0], s: [6.34, 1, 8.34], j: 0.04 }),
+    ...plates,
+    ...Array.from({ length: 5 }, (_, i) => { const a = (i / 5) * PI * 2 + 0.5; return P(blob(0.7, 100 + i, 0.3, 0), 0x5fae45, { p: [Math.cos(a) * 4.6, top - 0.15, Math.sin(a) * 6.2], s: [1.2, 0.35, 1.2] }); }),
+    ...Array.from({ length: 8 }, (_, i) => { const a = (i / 8) * PI * 2 + 0.3; return P(cone(0.16, 0.6, 5), 0xf0e6bc, { p: [Math.cos(a) * 5.2, top - 0.2, Math.sin(a) * 6.9] }); }),
   ], 1);
+  // head group origin = neck base at the shell front, so the head can nod while walking
+  const SK = 0x9fcf5a, SK2 = 0x86b848;
   const head = build([
-    P(cyl(0.9, 1.1, 2.4, 8), 0x9ab070, { p: [0, 0, 1.0], r: [1.15, 0, 0], g: 0.2 }), P(blob(1.35, 8, 0.1), 0xa6bc78, { p: [0, 0.1, -0.4], s: [1, 0.9, 1.3] }),
-    P(blob(0.7, 9, 0.1), 0xb2c684, { p: [0, -0.2, -1.5], s: [1, 0.7, 1] }),
-    P(cone(0.22, 0.6, 5), 0xe6d8a8, { p: [-0.7, 0.9, -0.3], r: [0, 0, 0.35] }), P(cone(0.22, 0.6, 5), 0xe6d8a8, { p: [0.7, 0.9, -0.3], r: [0, 0, -0.35] }),
-    P(blob(0.22, 10, 0.1, 0), 0x6a7a50, { p: [-0.55, 0.5, -1.2], s: [1.5, 0.5, 1] }), P(blob(0.22, 11, 0.1, 0), 0x6a7a50, { p: [0.55, 0.5, -1.2], s: [1.5, 0.5, 1] }),
+    P(cyl(1.1, 1.3, 3.2, 8), SK2, { p: [0, 0.15, -1.4], r: [-1.42, 0, 0], g: 0.15 }), // neck
+    P(blob(1.45, 8, 0.05), SK, { p: [0, 0.9, -3.6], s: [1.05, 0.95, 1.1], g: 0.15 }), // skull
+    P(blob(0.8, 9, 0.05), 0xb2dc6a, { p: [0, 0.4, -4.9], s: [1.1, 0.75, 1.0] }), // snout
+    P(box(1.2, 0.1, 0.1), 0x3a5a2a, { p: [0, 0.18, -5.62], j: 0 }), // smile
+    P(blob(0.1, 20, 0.05, 0), 0x2a3a20, { p: [-0.26, 0.62, -5.6], j: 0 }), P(blob(0.1, 21, 0.05, 0), 0x2a3a20, { p: [0.26, 0.62, -5.6], j: 0 }),
+    P(blob(0.3, 22, 0.05, 0), 0xff9a8a, { p: [-1.3, 0.45, -4.5], s: [0.8, 0.7, 0.6], j: 0 }), P(blob(0.3, 23, 0.05, 0), 0xff9a8a, { p: [1.3, 0.45, -4.5], s: [0.8, 0.7, 0.6], j: 0 }), // cheeks
+    P(box(0.8, 0.18, 0.3), 0x6c9a3c, { p: [-0.95, 2.1, -4.3], r: [0, 0, 0.3], j: 0 }), P(box(0.8, 0.18, 0.3), 0x6c9a3c, { p: [0.95, 2.1, -4.3], r: [0, 0, -0.3], j: 0 }), // brows
+    P(cone(0.26, 0.7, 5), 0xf0e6bc, { p: [-0.85, 2.15, -3.1], r: [0, 0, 0.35] }), P(cone(0.26, 0.7, 5), 0xf0e6bc, { p: [0.85, 2.15, -3.1], r: [0, 0, -0.35] }), // little horns
   ], 2);
-  const eyes = build([P(blob(0.26, 12, 0.05, 0), 0x1a1a24, { p: [-0.72, 0.28, -1.15], j: 0 }), P(blob(0.26, 13, 0.05, 0), 0x1a1a24, { p: [0.72, 0.28, -1.15], j: 0 }),
-    P(oct(0.08), 0xffffff, { p: [-0.78, 0.38, -1.36], j: 0 }), P(oct(0.08), 0xffffff, { p: [0.66, 0.38, -1.36], j: 0 })]);
-  const leg = build([P(cyl(1.0, 1.15, 2.3, 7), 0xa0b47c, { p: [0, -1.1, 0], g: 0.3 }), P(blob(1.3, 14, 0.1), 0x90a46c, { p: [0, -2.0, -0.2], s: [1, 0.45, 1.2] }),
-    ...[-0.6, 0, 0.6].map((x) => P(cone(0.22, 0.4, 4), 0xe6d8a8, { p: [x, -2.0, -1.1], r: [-1.3, 0, 0] }))], 3);
+  const eyes = build([
+    P(blob(0.46, 12, 0.03, 1), 0xffffff, { p: [-0.98, 1.55, -4.55], j: 0 }), P(blob(0.46, 13, 0.03, 1), 0xffffff, { p: [0.98, 1.55, -4.55], j: 0 }),
+    P(blob(0.26, 14, 0.03, 1), 0x15151e, { p: [-1.05, 1.55, -4.98], j: 0 }), P(blob(0.26, 15, 0.03, 1), 0x15151e, { p: [1.05, 1.55, -4.98], j: 0 }),
+    P(oct(0.08), 0xffffff, { p: [-1.1, 1.7, -5.2], j: 0 }), P(oct(0.08), 0xffffff, { p: [0.98, 1.7, -5.2], j: 0 }),
+  ]);
+  // leg pivot = hip. chunky green legs with cream toenails (distinct from the brown shell)
+  const leg = build([
+    P(cyl(1.15, 1.3, 2.2, 7), 0x6fa046, { p: [0, -1.0, 0], g: 0.25 }), P(blob(1.45, 14, 0.06), 0x82b552, { p: [0, -2.0, -0.2], s: [1.05, 0.5, 1.3], g: 0.2 }),
+    P(cyl(1.2, 1.2, 0.3, 7), 0xd9c88a, { p: [0, -0.1, 0], j: 0.04 }),
+    ...[-0.7, 0, 0.7].map((x) => P(cone(0.26, 0.5, 4), 0xf0e6bc, { p: [x, -2.1, -1.35], r: [-1.35, 0, 0], j: 0.03 })),
+  ], 3);
+  const tail = build([P(cone(0.8, 2.6, 6), 0x86b848, { p: [0, 0.2, 1.3], r: [PI / 2 + 0.35, 0, 0], g: 0.15 }), P(blob(0.28, 30, 0.05, 0), 0xf0e6bc, { p: [0, -0.2, 2.65], j: 0 })], 4);
   const planks = [];
   for (let i = 0; i < 8; i++) planks.push(P(box(DECK.x * 2 / 8 - 0.04, 0.4, DECK.z * 2 + 0.2), i % 2 ? 0xb88a56 : 0xa87c4a, { p: [-DECK.x + (i + 0.5) * (DECK.x * 2 / 8), DECK.y - 0.2, 0], j: 0.08 }));
   const rail = (x, z, sx, sz) => P(box(sx, 0.1, sz), 0x7a5632, { p: [x, DECK.y + 0.75, z] });
@@ -136,7 +158,7 @@ export function beastParts() {
     P(cyl(0.14, 0.18, 1.4, 6), 0x5a3e28, { p: [0, DECK.y + 0.7, -DECK.z + 0.5] }), P(oct(0.3), 0x6fe0d0, { p: [0, DECK.y + 1.6, -DECK.z + 0.5], j: 0 }),
     P(cone(0.35, 0.8, 6), 0xe6d8a8, { p: [-0.5, DECK.y + 1.2, -DECK.z + 0.5], r: [0, 0, 1.2] }),
   ], 4);
-  return { shell, head, eyes, leg, deck };
+  return { shell, head, eyes, leg, tail, deck };
 }
 
 // ---------- modules (origin at deck surface, wall runs along x)
