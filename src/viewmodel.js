@@ -12,9 +12,9 @@ export class ViewModel {
     this.hemi = new THREE.HemisphereLight(0xffffff, 0x556655, 1.0);
     this.dir = new THREE.DirectionalLight(0xfff0d8, 1.1); this.dir.position.set(-0.6, 1, 0.8);
     this.scene.add(this.hemi, this.dir);
-    this.group = new THREE.Group(); this.scene.add(this.group);
+    this.group = new THREE.Group(); this.group.scale.setScalar(0.6); this.scene.add(this.group);
     this.mesh = new THREE.Mesh(new THREE.BufferGeometry(), lit()); this.group.add(this.mesh);
-    this.flame = glowSprite(glowTex, 0xffa84a, 0.45); this.flame.position.set(0, 0.62, 0); this.flame.visible = false; this.mesh.add(this.flame);
+    this.flame = glowSprite(glowTex, 0xffa84a, 0.7); this.flame.position.set(0, 0.62, 0); this.flame.visible = false; this.mesh.add(this.flame);
     this.core = glowSprite(glowTex, 0xfff0b0, 0.2); this.core.position.set(0, 0.6, 0); this.core.visible = false; this.mesh.add(this.core);
     this.slot = 'axe'; this.tier = 0; this.swingT = 0; this.swingDur = 0.5; this.swapT = 1;
     this.kick = 0;
@@ -33,11 +33,11 @@ export class ViewModel {
     this.swapT = Math.min(1, this.swapT + dt * 4.5);
     const s = this.swingT > 0 ? 1 - this.swingT : 0;
     const g = this.group;
-    let rx = -0.5, ry = 0.0, rz = 0.18, px = 0.36, py = -0.36, pz = -0.62;
+    let rx = -0.5, ry = 0.0, rz = 0.18, px = 0.42, py = -0.3, pz = -0.7;
     const sw = this.swingT > 0;
-    if (this.slot === 'melee' && this.tier > 1) { rx = -1.25; rz = 0.1; py = -0.3; pz = -0.45; if (sw) pz -= Math.sin(s * Math.PI) * 0.55; }
-    else if (this.slot === 'ranged') { rx = -1.45; rz = 0; ry = 0.1; px = 0.22; py = -0.26; pz = -0.45; if (sw) { pz += Math.sin(s * Math.PI) * 0.1; rx += Math.sin(s * Math.PI) * 0.15; } }
-    else if (this.slot === 'torch') { rx = -0.25; rz = 0.1; px = 0.33; py = -0.3; if (sw) rx -= Math.sin(s * Math.PI) * 0.8; }
+    if (this.slot === 'melee' && this.tier > 1) { rx = -1.25; rz = 0.1; py = -0.34; pz = -0.55; if (sw) pz -= Math.sin(s * Math.PI) * 0.55; }
+    else if (this.slot === 'ranged') { rx = -1.45; rz = 0; ry = 0.1; px = 0.3; py = -0.3; pz = -0.55; if (sw) { pz += Math.sin(s * Math.PI) * 0.1; rx += Math.sin(s * Math.PI) * 0.15; } }
+    else if (this.slot === 'torch') { rx = -0.2; rz = 0.08; px = 0.4; py = -0.12; if (sw) rx -= Math.sin(s * Math.PI) * 0.8; }
     else if (sw) {
       let a;
       if (s < 0.25) a = -(s / 0.25) * 0.9; else if (s < 0.5) a = -0.9 + ((s - 0.25) / 0.25) * 1.9; else a = 1.0 * (1 - (s - 0.5) / 0.5);
@@ -48,7 +48,7 @@ export class ViewModel {
     g.rotation.set(rx, ry, rz);
     if (this.flame.visible) {
       const f = 0.9 + Math.sin(t * 17) * 0.08 + Math.sin(t * 29) * 0.05;
-      this.flame.scale.setScalar(0.5 * f); this.flame.position.y = 0.64 + Math.sin(t * 13) * 0.01; this.core.scale.setScalar(0.2 * f);
+      this.flame.scale.setScalar(1.15 * f); this.flame.position.y = 0.66 + Math.sin(t * 13) * 0.012; this.core.scale.setScalar(0.3 * f);
     }
     this.hemi.intensity = 0.55 + 0.5 * light;
     this.dir.intensity = 0.2 + 1.0 * light;

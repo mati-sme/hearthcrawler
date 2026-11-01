@@ -60,8 +60,8 @@ export function grassGeo() {
   const pos = [], col = [], nor = [];
   for (let b = 0; b < 3; b++) {
     const a = (b / 3) * PI, c = Math.cos(a), s = Math.sin(a);
-    const w = 0.09, h = 0.55;
-    const tri = [[-w, 0, 0, 0.45], [w, 0, 0, 0.45], [0.02, h, 0.03, 1.0]];
+    const w = 0.075, h = 0.4;
+    const tri = [[-w, 0, 0, 0.62], [w, 0, 0, 0.62], [0.02, h, 0.03, 1.0]];
     for (const v of tri) { pos.push(v[0] * c + v[2] * s, v[1], -v[0] * s + v[2] * c); col.push(v[3], v[3], v[3]); nor.push(0, 1, 0); }
   }
   const g = new THREE.BufferGeometry();
@@ -107,22 +107,22 @@ export function foeGeo(type) {
 export function beastParts() {
   const shellH = 3.4, legH = 1.9;
   const shell = build([
-    P(new THREE.CylinderGeometry(0.86, 1, shellH, 14, 1), 0x6a5a3a, { p: [0, legH + shellH / 2, 0], s: [6.2, 1, 8.2], g: 0.35, j: 0.1 }),
-    ...Array.from({ length: 12 }, (_, i) => { const a = (i / 12) * PI * 2; return P(blob(0.9, 100 + i, 0.3, 0), i % 2 ? 0x5a8a4a : 0x4a7a40, { p: [Math.cos(a) * 5.3, legH + 0.6 + (i % 3) * 0.5, Math.sin(a) * 7.0], s: [1.2, 0.7, 1.2] }); }),
+    P(new THREE.CylinderGeometry(0.86, 1, shellH, 14, 1), 0xa08a52, { p: [0, legH + shellH / 2, 0], s: [6.2, 1, 8.2], g: 0.35, j: 0.1 }),
+    ...Array.from({ length: 12 }, (_, i) => { const a = (i / 12) * PI * 2; return P(blob(0.9, 100 + i, 0.3, 0), i % 2 ? 0x6aa458 : 0x5a9448, { p: [Math.cos(a) * 5.3, legH + 0.6 + (i % 3) * 0.5, Math.sin(a) * 7.0], s: [1.2, 0.7, 1.2] }); }),
     ...Array.from({ length: 9 }, (_, i) => { const a = (i / 9) * PI * 2 + 0.3; return P(cone(0.12, 0.45, 4), 0x78b05a, { p: [Math.cos(a) * 5.1, legH + shellH - 0.3, Math.sin(a) * 6.8] }); }),
   ], 1);
   const head = build([
-    P(cyl(0.9, 1.1, 2.4, 8), 0x7a8a5a, { p: [0, 0, 1.0], r: [1.15, 0, 0], g: 0.2 }), P(blob(1.35, 8, 0.1), 0x8a9a62, { p: [0, 0.1, -0.4], s: [1, 0.9, 1.3] }),
-    P(blob(0.7, 9, 0.1), 0x9aaa6e, { p: [0, -0.2, -1.5], s: [1, 0.7, 1] }),
+    P(cyl(0.9, 1.1, 2.4, 8), 0x9ab070, { p: [0, 0, 1.0], r: [1.15, 0, 0], g: 0.2 }), P(blob(1.35, 8, 0.1), 0xa6bc78, { p: [0, 0.1, -0.4], s: [1, 0.9, 1.3] }),
+    P(blob(0.7, 9, 0.1), 0xb2c684, { p: [0, -0.2, -1.5], s: [1, 0.7, 1] }),
     P(cone(0.22, 0.6, 5), 0xe6d8a8, { p: [-0.7, 0.9, -0.3], r: [0, 0, 0.35] }), P(cone(0.22, 0.6, 5), 0xe6d8a8, { p: [0.7, 0.9, -0.3], r: [0, 0, -0.35] }),
     P(blob(0.22, 10, 0.1, 0), 0x6a7a50, { p: [-0.55, 0.5, -1.2], s: [1.5, 0.5, 1] }), P(blob(0.22, 11, 0.1, 0), 0x6a7a50, { p: [0.55, 0.5, -1.2], s: [1.5, 0.5, 1] }),
   ], 2);
   const eyes = build([P(blob(0.26, 12, 0.05, 0), 0x1a1a24, { p: [-0.72, 0.28, -1.15], j: 0 }), P(blob(0.26, 13, 0.05, 0), 0x1a1a24, { p: [0.72, 0.28, -1.15], j: 0 }),
     P(oct(0.08), 0xffffff, { p: [-0.78, 0.38, -1.36], j: 0 }), P(oct(0.08), 0xffffff, { p: [0.66, 0.38, -1.36], j: 0 })]);
-  const leg = build([P(cyl(1.0, 1.15, 2.3, 7), 0x6a7a4e, { p: [0, -1.1, 0], g: 0.3 }), P(blob(1.3, 14, 0.1), 0x5a6a42, { p: [0, -2.0, -0.2], s: [1, 0.45, 1.2] }),
+  const leg = build([P(cyl(1.0, 1.15, 2.3, 7), 0xa0b47c, { p: [0, -1.1, 0], g: 0.3 }), P(blob(1.3, 14, 0.1), 0x90a46c, { p: [0, -2.0, -0.2], s: [1, 0.45, 1.2] }),
     ...[-0.6, 0, 0.6].map((x) => P(cone(0.22, 0.4, 4), 0xe6d8a8, { p: [x, -2.0, -1.1], r: [-1.3, 0, 0] }))], 3);
   const planks = [];
-  for (let i = 0; i < 8; i++) planks.push(P(box(DECK.x * 2 / 8 - 0.04, 0.4, DECK.z * 2 + 0.2), i % 2 ? 0xa07a4a : 0x946e42, { p: [-DECK.x + (i + 0.5) * (DECK.x * 2 / 8), DECK.y - 0.2, 0], j: 0.08 }));
+  for (let i = 0; i < 8; i++) planks.push(P(box(DECK.x * 2 / 8 - 0.04, 0.4, DECK.z * 2 + 0.2), i % 2 ? 0xb88a56 : 0xa87c4a, { p: [-DECK.x + (i + 0.5) * (DECK.x * 2 / 8), DECK.y - 0.2, 0], j: 0.08 }));
   const rail = (x, z, sx, sz) => P(box(sx, 0.1, sz), 0x7a5632, { p: [x, DECK.y + 0.75, z] });
   const post = (x, z) => P(cyl(0.1, 0.12, 0.95, 5), 0x6a4a2a, { p: [x, DECK.y + 0.45, z] });
   const deck = build([...planks,
@@ -130,7 +130,7 @@ export function beastParts() {
     rail(-DECK.x, 0, 0.1, DECK.z * 2), rail(DECK.x, 0, 0.1, DECK.z * 2), rail(0, -DECK.z, DECK.x * 2, 0.1),
     rail(-DECK.x + 0.6, DECK.z, 1.2, 0.1), rail(DECK.x - 0.6, DECK.z, 1.2, 0.1),
     // ramp
-    P(box(2.5, 0.25, Math.hypot(7, DECK.y)), 0x8a6840, { p: [0, DECK.y / 2 - 0.1, DECK.z + 3.5], r: [-Math.atan2(DECK.y, 7), 0, 0], j: 0.06 }),
+    P(box(2.5, 0.25, Math.hypot(7, DECK.y)), 0xb08454, { p: [0, DECK.y / 2 - 0.1, DECK.z + 3.5], r: [-Math.atan2(DECK.y, 7), 0, 0], j: 0.06 }),
     ...Array.from({ length: 9 }, (_, i) => P(box(2.5, 0.08, 0.14), 0x5a4028, { p: [0, DECK.y - (i + 0.6) * (DECK.y / 9.8) + 0.05, DECK.z + 0.6 + i * 0.72], j: 0 })),
     // helm post
     P(cyl(0.14, 0.18, 1.4, 6), 0x5a3e28, { p: [0, DECK.y + 0.7, -DECK.z + 0.5] }), P(oct(0.3), 0x6fe0d0, { p: [0, DECK.y + 1.6, -DECK.z + 0.5], j: 0 }),

@@ -12,7 +12,7 @@ export class Caravan {
     this.scene = scene; this.glowTex = glowTex;
     this.root = new THREE.Group(); this.body = new THREE.Group(); this.root.add(this.body);
     scene.add(this.root);
-    const P = beastParts(), mat = lit(), glowMat = unlit({ fog: true });
+    const P = beastParts(), mat = lit({ emissive: 0x4a3c24, emissiveIntensity: 0.75 }), glowMat = unlit({ fog: true });
     this.mat = mat; this.glowMat = glowMat;
     const mk = (g, parent = this.body) => { const m = new THREE.Mesh(g, mat); m.castShadow = true; m.receiveShadow = true; parent.add(m); return m; };
     mk(P.shell); mk(P.deck);
@@ -134,6 +134,6 @@ export class Caravan {
     this.ghost.visible = true;
     this.ghost.position.set(SLOT_POS[slot][0], DECK.y, SLOT_POS[slot][1]); this.ghost.rotation.y = SLOT_ROT[slot];
     this.ghostMat.color.set(ok ? 0x9ffff0 : 0xff7a5a);
-    this.ghostMat.opacity = 0.45 + Math.sin(performance.now() * 0.006) * 0.12;
+    this.ghostMat.opacity = 0.62 + Math.sin(performance.now() * 0.006) * 0.12;
   }
 }

@@ -59,8 +59,8 @@ export class FX {
   }
   smoke(x, y, z) { this.spawn(1, x, y, z, (Math.random() - 0.5) * 0.4, 1.0, (Math.random() - 0.5) * 0.4, 0.22, 1.2, -0.3, 0x55606e, 1.8); }
   tracer(a, b, hex) {
-    const n = 7;
-    for (let i = 0; i < n; i++) { const f = i / (n - 1); this.spawn(1, a.x + (b.x - a.x) * f, a.y + (b.y - a.y) * f, a.z + (b.z - a.z) * f, 0, 0, 0, 0.12, 0.18 + 0.12 * (1 - f), 0, hex); }
+    const n = 12;
+    for (let i = 0; i < n; i++) { const f = i / (n - 1); this.spawn(1, a.x + (b.x - a.x) * f, a.y + (b.y - a.y) * f, a.z + (b.z - a.z) * f, 0, 0, 0, 0.11, 0.3 + 0.25 * (1 - f), 0, hex); }
   }
   update(dt) {
     let ci = 0, gi = 0;

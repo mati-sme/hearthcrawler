@@ -74,7 +74,7 @@ export class World {
         const hc = (t[2] + t[5] + t[8]) / 3;
         colorAt(x + (t[0] + t[3] + t[6]) / 3, z + (t[1] + t[4] + t[7]) / 3, hc, tmp);
         const f = 0.93 + hash2(i * 3 + cx * 50, j * 5 + cz * 70, o) * 0.14;
-        for (let v = 0; v < 3; v++) {
+        for (const v of [0, 2, 1]) { // counter-clockwise seen from above
           pos[o] = x + t[v * 3]; pos[o + 1] = t[v * 3 + 2]; pos[o + 2] = z + t[v * 3 + 1];
           col[o] = tmp.r * f; col[o + 1] = tmp.g * f; col[o + 2] = tmp.b * f; o += 3;
         }
@@ -193,7 +193,7 @@ export class World {
       if (Math.abs(x) < 7 && Math.abs(z - cz) < 9.2) continue;
       if (gi >= 4600) break;
       const fade = 1 - sstep(R - 9, R, d);
-      const s = (0.7 + hash2(gx, gz, 6) * 0.9) * fade;
+      const s = (0.65 + hash2(gx, gz, 6) * 0.7) * fade;
       Q.setFromAxisAngle(UP, hash2(gx, gz, 8) * 6.28);
       M.compose(V.set(x, terrainH(x, z) - 0.03, z), Q, S.set(s, s * (0.8 + h1 * 0.6), s));
       this.grass.setMatrixAt(gi, M);

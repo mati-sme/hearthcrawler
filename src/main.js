@@ -33,7 +33,7 @@ const quality = { pr: Math.min(dpr, 1.5), shadows: qmode !== 'low', mode: qmode 
 const renderer = new THREE.WebGLRenderer({ canvas: $('gl'), antialias: dpr < 2, powerPreference: 'high-performance' });
 renderer.setPixelRatio(quality.pr);
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap;
-renderer.autoClear = false;
+renderer.autoClear = false; renderer.info.autoReset = false;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(72, 2, 0.1, 125);
 camera.rotation.order = 'YXZ';
@@ -205,7 +205,7 @@ function doInteract() {
   if (t.kind === 'helm') { startTravel(false); return; }
   if (t.kind === 'mod') {
     const m = t.ref, slot = t.slot;
-    if (m.type === 'bed') { state.hp = state.maxHp; state.spawn = 'bed'; ui.notify('RESTED · RESPAWN POINT SET'); Audio.sfx.goal(); fx.sparkle(player.x, player.y + 1.5, player.z, 0x9fd4ff, 10, 2); return; }
+    if (m.type === 'bed') { state.hp = state.maxHp; state.spawn = 'bed'; ui.notify('RESTED · RESPAWN POINT SET'); Audio.sfx.goal(); fx.sparkle(player.x, player.y + 0.3, player.z, 0x9fd4ff, 6, 2); return; }
     if (m.type === 'furnace') {
       const got = C.furnaceCollect(state, slot);
       if (got) { popRes(player.x, player.y + 1.6, player.z, 'metal', got); Audio.sfx.pickup(); return; }
@@ -219,7 +219,7 @@ function doInteract() {
 }
 function boardNow() {
   player.teleport(0, car.cz + DECK.z - 0.8, car); player.yaw = 0; player.pitch = -0.12;
-  C.onBoard(state); Audio.sfx.goal(); fx.sparkle(player.x, player.y + 1, player.z, 0x6fe0d0, 10, 3);
+  C.onBoard(state); Audio.sfx.goal(); fx.sparkle(player.x, player.y + 0.2, player.z, 0x6fe0d0, 6, 2.5);
 }
 
 // ---------- attacking / gathering
@@ -272,15 +272,15 @@ function hitNode(n, slot) {
   const power = attackPower(slot, n);
   const y = C.hitYield(state, n, n.kind, power, n.hp - power <= 0);
   n.hp -= power; world.shake(n);
-  const col = { tree: 0x8a6038, rock: 0x9aa3ab, ore: 0xffb23a, crystal: 0x6fe0d0, bush: 0x4aa045, scrap: 0xc8d0d8 }[n.kind];
-  const leaf = n.mesh === 'oak' ? 0x4f9a3c : n.mesh === 'maple' ? 0xe0702a : n.mesh === 'snowpine' || n.mesh === 'pine' ? 0x2f7a45 : col;
-  fx.burst(n.x + (_e.x - n.x) * 0.25, n.y + 1.3, n.z + (_e.z - n.z) * 0.25, n.kind === 'tree' && Math.random() < 0.5 ? leaf : col, 6, 4);
+  const col = { tree: 0xd9a05b, rock: 0x9aa3ab, ore: 0xffb23a, crystal: 0x6fe0d0, bush: 0x4aa045, scrap: 0xc8d0d8 }[n.kind];
+  const leaf = n.mesh === 'oak' ? 0x7acb52 : n.mesh === 'maple' ? 0xf08a3a : n.mesh === 'snowpine' || n.mesh === 'pine' ? 0x2f7a45 : col;
+  fx.burst(n.x + (_e.x - n.x) * 0.3, n.y + 1.5, n.z + (_e.z - n.z) * 0.3, n.kind === 'tree' ? (Math.random() < 0.5 ? leaf : 0xe0b070) : col, 8, 4, 0.2);
   (n.kind === 'rock' || n.kind === 'ore' || n.kind === 'crystal') ? Audio.sfx.mine() : Audio.sfx.chop();
   let i = 0;
   for (const r in y) {
     const got = C.addRes(state, r, y[r]);
     if (got < y[r]) fx.popup(n.x, n.y + n.h * 0.8 + i * 0.4, n.z, `${D.RES[r].name} FULL`, 'hurt');
-    if (got > 0) popRes(n.x, n.y + n.h * 0.7 + i * 0.4, n.z, r, got);
+    if (got > 0) popRes(n.x, n.y + 2.0 + i * 0.45, n.z, r, got);
     i++;
   }
   if (n.hp <= 0) {
@@ -379,7 +379,7 @@ function drainEvents() {
       case 'goal': goals.push(e); break;
       case 'levelup': Audio.sfx.level(); ui.notify(`<b>LEVEL UP!</b> LV ${e.level}<small>${Object.keys(e.res).map((k) => `+${e.res[k]} ${D.RES[k].name}`).join(' ')}</small>`, 'goal');
         fx.popup(player.x - Math.sin(player.yaw) * 2, player.y + 2.2, player.z - Math.cos(player.yaw) * 2, 'LEVEL UP!', 'big');
-        fx.sparkle(player.x, player.y + 1, player.z, 0xffd24a, 24, 5); fx.sparkle(player.x, player.y + 1, player.z, 0x6fe0d0, 16, 4); break;
+        fx.sparkle(player.x, player.y + 0.3, player.z, 0xffd24a, 14, 4); fx.sparkle(player.x, player.y + 0.3, player.z, 0x6fe0d0, 10, 3); break;
       case 'craft': Audio.sfx.craft(); ui.notify(`CRAFTED ${e.name.toUpperCase()}`); equip(); break;
       case 'upgrade': Audio.sfx.build(); ui.notify(`${MODS[e.type].name.toUpperCase()} UPGRADED · LV ${e.lv}`); break;
       case 'build': ui.notify(`${MODS[e.type].name.toUpperCase()} BUILT`); break;
@@ -436,7 +436,7 @@ window.addEventListener('pagehide', save);
 
 // ---------- main update
 const sh = { x: 0, y: 0 };
-function paused() { return R.uiPause || document.hidden || window.innerHeight > window.innerWidth; }
+function paused() { return R.frozen || R.uiPause || document.hidden || window.innerHeight > window.innerWidth; }
 function update(dt) {
   R.t += dt;
   stepClock(dt);
@@ -480,7 +480,7 @@ function update(dt) {
   // world
   enemies.update(dt, {
     state, car, px: player.x, py: player.y, pz: player.z, playerOnDeck: player.onDeck, groundY: (x, z, y) => player.groundY(x, z, y, car),
-    damagePlayer, damageModule, hitFoe, sfx: (n) => Audio.sfx[n](),
+    damagePlayer, damageModule, hitFoe, sfx: (n) => Audio.sfx[n](), turretFired: () => { R.shots = (R.shots || 0) + 1; }, hold: R.hold,
   });
   if (R.nightActive && enemies.boss) R.bossBar = enemies.boss; else R.bossBar = null;
   world.stream(player.x, player.z, 1);
@@ -504,6 +504,7 @@ function render(dt = 0.016) {
   camBase.set(player.x, player.y + EYE + Math.sin(player.bob * 2) * 0.045 * player.moveAmt, player.z);
   camera.position.copy(camBase);
   camera.rotation.set(player.pitch + sh.y, player.yaw + sh.x, (R.travel ? Math.sin(R.t * 0.9) * 0.008 : 0) - (inp.moveX || 0) * 0.012 * player.moveAmt, 'YXZ');
+  if (R.camOverride) { camera.position.copy(R.camOverride.pos); camera.lookAt(R.camOverride.at); }
   camera.fov = 72 + (player.sprinting ? 4 : 0); camera.updateProjectionMatrix();
   const info = sky.update(state.tod, car.cz, R.t, camera, camBase, renderer.domElement.height);
   // torch / night light
@@ -516,16 +517,16 @@ function render(dt = 0.016) {
   } else { torch.color.set(0x9fc0ff); torch.intensity = nightness * 1.4; torch.distance = 12; torch.decay = 1.6; torch.position.copy(camBase); }
   vm.update(dt, R.t, player.moveAmt, player.bob, Math.max(0.25, 1 - nightness * 0.75));
   vm.hemi.color.copy(sky.hemi.color); vm.dir.color.copy(sky.sun.color);
+  renderer.info.reset();
   renderer.clear();
   renderer.render(scene, camera);
-  renderer.clearDepth();
-  renderer.render(vm.scene, vm.cam);
+  if (!R.camOverride) { renderer.clearDepth(); renderer.render(vm.scene, vm.cam); }
   fx.updatePopups(dt, camera, window.innerWidth, window.innerHeight);
 }
 function hudFrame(dt) {
   const slot = SLOTS[R.sel];
   const tgt = R.target;
-  const atk = tgt && tgt.kind === 'foe' ? 'ATTACK' : slot === 'axe' ? 'CHOP' : slot === 'pick' ? 'MINE' : slot === 'melee' ? 'STRIKE' : slot === 'ranged' ? 'SHOOT' : slot === 'hammer' ? 'REPAIR' : 'SWING';
+  const atk = R.building ? 'HAMMER' : tgt && tgt.kind === 'foe' ? 'ATTACK' : slot === 'axe' ? 'CHOP' : slot === 'pick' ? 'MINE' : slot === 'melee' ? 'STRIKE' : slot === 'ranged' ? 'SHOOT' : slot === 'hammer' ? 'REPAIR' : 'SWING';
   ui.hud(dt, {
     sel: R.sel, building: R.building, target: tgt, interact: R.interact, atkLabel: atk, boss: R.bossBar, hurt: player.hurt, yaw: player.yaw,
     cvBearing: Math.atan2(0 - player.x, -(car.cz - player.z)), cvDist: Math.hypot(player.x, player.z - car.cz),
@@ -538,7 +539,8 @@ function loop(now) {
   requestAnimationFrame(loop);
   const raw = Math.min(0.1, (now - last) / 1000); last = now;
   if (!paused()) update(Math.min(raw, 0.05));
-  hudFrame(raw); render(raw);
+  const rdt = R.frozen ? 0 : raw;
+  hudFrame(rdt); render(rdt);
   acc += raw; frames++; fpsT += raw;
   if (fpsT > 1) { fps = frames / fpsT; frames = 0; fpsT = 0; if (DEBUG) $('dbg').textContent = `${fps.toFixed(0)} fps · ${renderer.info.render.calls} calls · ${renderer.info.render.triangles} tris`; if (quality.mode === 'auto' && fps < 28 && !paused()) { if (++slow >= 3 && quality.pr > 1) { quality.pr = 1; quality.shadows = false; renderer.setPixelRatio(1); sky.setQuality(quality); resize(); } } else slow = 0; }
 }
@@ -570,8 +572,8 @@ window.__HC = {
   look(yaw, pitch) { player.yaw = yaw; if (pitch !== undefined) player.pitch = pitch; },
   select, startBuild(t) { R.buildType = t; return enterBuild(); }, placeAt(slot, t) { R.buildSlot = slot; R.buildType = t; R.manualSlot = performance.now() + 1e6; if (!R.building) enterBuild(); placeModule(); },
   exitBuild, attack() { startSwing(); }, doHit, findTarget, interact: doInteract, save, equip,
-  nearestNode(kind) { let b = null, bd = 1e9; for (const n of world.nodesNear(player.x, player.z, 60)) if (n.kind === kind) { const d = Math.hypot(n.x - player.x, n.z - player.z); if (d < bd) { bd = d; b = n; } } return b; },
-  faceNode(n, dist = 2.4) { const dx = n.x - player.x, dz = n.z - player.z, d = Math.hypot(dx, dz); player.teleport(n.x - dx / d * dist, n.z - dz / d * dist, car); player.yaw = Math.atan2(-dx, -dz); player.pitch = -Math.atan2(n.h * 0.4 + 0.3 - 0.2, dist) * 0.6; },
+  nearestNode(kind, mesh) { let b = null, bd = 1e9; for (const n of world.nodesNear(player.x, player.z, 60)) if (n.kind === kind && (!mesh || n.mesh === mesh)) { const d = Math.hypot(n.x - player.x, n.z - player.z); if (d < bd) { bd = d; b = n; } } return b; },
+  faceNode(n, dist = 2.4, aimY) { const dx = n.x - player.x, dz = n.z - player.z, d = Math.hypot(dx, dz); player.teleport(n.x - dx / d * dist, n.z - dz / d * dist, car); player.yaw = Math.atan2(-dx, -dz); player.pitch = Math.atan2((aimY === undefined ? n.h * 0.45 : aimY) - EYE, dist); },
   setZone(k) { state.zone = k; car.setPos(-k * ZONE_LEN, terrainH(0, -k * ZONE_LEN)); state.cz = car.cz; world.stream(0, car.cz, 100); player.teleport(0, car.cz + 16, car); world.updateGrass(player.x, player.z, car.cz, true); },
-  fps: () => fps,
+  fps: () => fps, freeze(f) { R.frozen = f; }, hold(h) { R.hold = h; }, clearNotes() { ui.clearNotes(); fx.pops.forEach((p) => { p.on = false; p.el.style.display = 'none'; }); }, cam(pos, at) { R.camOverride = pos ? { pos: new THREE.Vector3(...pos), at: new THREE.Vector3(...at) } : null; },
 };

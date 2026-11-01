@@ -53,7 +53,7 @@ void main(){
   vec3 wp = uCam + p + vec3(0.,2.,0.);
   vec4 mv = viewMatrix * vec4(wp, 1.);
   gl_Position = projectionMatrix * mv;
-  gl_PointSize = uSize * uScale / max(0.5, -mv.z);
+  gl_PointSize = min(26., uSize * 3.0 * (uScale / 520.) * clamp(10. / max(2., -mv.z), 0.6, 3.0));
   vA = (0.55 + 0.45*sin(uTime*1.6 + aOff.x*40.)) * smoothstep(23., 9., length(p));
 }`;
 const MOTE_F = `uniform vec3 uCol; uniform float uAlpha; varying float vA;
@@ -136,8 +136,8 @@ export class Sky {
     this.sun.position.copy(focus).addScaledVector(dir, 70);
     this.sun.target.position.copy(focus);
     this.hemi.color.copy(hor).lerp(zen, 0.5).lerp(col(0xffffff), 0.15 * dayW);
-    this.hemi.groundColor.set(A.ground[0]).lerp(this.tmp.b.set(B.ground[0]), w).multiplyScalar(0.5 * dayW + 0.4 * goldW + 0.35 * nightW);
-    this.hemi.intensity = 0.3 + 0.62 * dayW + 0.5 * goldW + 0.85 * nightW;
+    this.hemi.groundColor.set(A.ground[0]).lerp(this.tmp.b.set(B.ground[0]), w).multiplyScalar(0.8 * dayW + 0.6 * goldW + 0.4 * nightW);
+    this.hemi.intensity = 0.4 + 0.75 * dayW + 1.0 * goldW + 0.85 * nightW;
     // motes
     const mo = A.mote, mb = B.mote, m = w < 0.5 ? mo : mb;
     const MU = this.MU;

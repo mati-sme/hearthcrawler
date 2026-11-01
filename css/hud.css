@@ -24,7 +24,7 @@ canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block}
 #clock .in{display:flex;align-items:center;gap:6px;font-size:12px;padding:5px 9px;font-weight:700}
 #clk-ic{color:var(--ember);font-size:16px;display:flex}
 #clk-time{color:var(--ice)}
-#zone{position:absolute;right:58px;top:41px;font-size:10px;color:var(--dim);letter-spacing:.14em;text-shadow:0 1px 3px #000}
+#zone{position:absolute;right:58px;top:42px;font-size:10px;color:var(--txt);letter-spacing:.14em;background:rgba(9,15,19,.55);padding:1px 7px;clip-path:polygon(5px 0,100% 0,100% 100%,0 100%,0 5px)}
 .btn{pointer-events:auto;border:0;color:var(--txt);font-family:var(--font);font-stretch:condensed;text-transform:uppercase;letter-spacing:.1em;font-weight:700;background:var(--line);padding:0;position:absolute;
  clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px}
 .btn::before{content:"";position:absolute;inset:1px;background:rgba(9,15,19,.7);clip-path:polygon(11.5px 0,100% 0,100% calc(100% - 11.5px),calc(100% - 11.5px) 100%,0 100%,0 11.5px)}
@@ -94,10 +94,11 @@ canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block}
 .note.out{opacity:0;transform:translateY(-8px)}
 @keyframes nin{from{opacity:0;transform:translateY(-8px)}}
 /* build bar */
-#buildbar{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);display:flex;align-items:flex-end;gap:8px;pointer-events:auto;z-index:2}
+#buildbar{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:5px;pointer-events:auto;z-index:2}
+.bb-top{display:flex;align-items:flex-end;gap:6px}
 #bb-types{display:flex;gap:5px}
-#bb-types .slot{width:42px;height:42px;font-size:20px}
-#bb-info{position:relative;background:var(--line);clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);min-width:150px;max-width:190px}
+#bb-types .slot{width:40px;height:40px;font-size:19px}
+#bb-info{position:relative;background:var(--line);clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);min-width:190px;max-width:230px}
 #bb-info>div{margin:1px;background:rgba(9,15,19,.8);padding:5px 9px;font-size:11px;line-height:1.25;clip-path:polygon(7.5px 0,100% 0,100% calc(100% - 7.5px),calc(100% - 7.5px) 100%,0 100%,0 7.5px)}
 #bb-info b{color:var(--ice);font-size:12px}
 .bb-nav{display:flex;gap:5px}

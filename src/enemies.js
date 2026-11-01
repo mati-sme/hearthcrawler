@@ -86,6 +86,7 @@ export class Enemies {
     for (const e of this.list) {
       if (e.dying > 0) { e.dying -= dt; e.g.scale.multiplyScalar(Math.max(0, 1 - dt * 8)); if (e.dying <= 0) e.g.visible = false; continue; }
       if (!e.alive) continue;
+      if (ctx.hold) { e.flash = Math.max(0, e.flash - dt); e.g.position.set(e.x, e.y, e.z); e.g.rotation.set(0, e.yaw, 0); continue; }
       const f = FOES[e.type];
       e.flash = Math.max(0, e.flash - dt); e.body.material.emissiveIntensity = e.flash > 0 ? 0.85 : 0;
       e.cd -= dt; e.atk = Math.max(0, e.atk - dt * 3);
@@ -154,7 +155,7 @@ export class Enemies {
         const dist = mz.distanceTo(to), tt = dist / 80;
         this.fx.tracer(mz, to, m.lv >= 4 ? 0x6fe0d0 : 0xffd27a);
         const dirx = (to.x - mz.x) / dist, diry = (to.y - mz.y) / dist, dirz = (to.z - mz.z) / dist;
-        this.fx.spawn(1, mz.x, mz.y, mz.z, dirx * 80, diry * 80, dirz * 80, 0.28, tt + 0.02, 0, 0xffffff);
+        this.fx.spawn(1, mz.x, mz.y, mz.z, dirx * 80, diry * 80, dirz * 80, 0.3, tt + 0.02, 0, 0xffffff);
         this.fx.sparkle(mz.x, mz.y, mz.z, 0xffd27a, 4, 2);
         this.pending.push({ t: tt, e: tgt, dmg: TURRET.dmg[lv] * (1 + 0.05 * state.beast), from: p.clone() });
         ctx.sfx && ctx.sfx('turret');

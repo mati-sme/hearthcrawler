@@ -15,7 +15,7 @@ export function newState() {
     stats: { gathered: {}, built: {}, kills: 0, bossKills: 0, travels: 0, nights: 0, boarded: false, deaths: 0, smelted: 0 },
     goal: 0, goalBase: 0,
     xp: 0, level: 1, maxHp: 100, hp: 100, hunger: 100, stamina: 100,
-    zone: 0, tod: 0.06, day: 1, nightDone: false,
+    zone: 0, tod: 0.16, day: 1, nightDone: false,
     beast: 0, cz: 0, spawn: 'deck',
     flags: { gift: false },
     ev: [],
@@ -369,7 +369,7 @@ export function sanitize(raw) {
     s.hp = num(raw.hp, s.maxHp, 1, s.maxHp);
     s.hunger = num(raw.hunger, 100, 0, 100);
     s.zone = Math.floor(num(raw.zone, 0, 0, 1e4));
-    s.tod = num(raw.tod, 0.06, 0, 0.9999);
+    s.tod = num(raw.tod, 0.16, 0, 0.9999);
     s.day = Math.floor(num(raw.day, 1, 1, 1e6));
     s.nightDone = !!raw.nightDone;
     s.beast = Math.floor(num(raw.beast, 0, 0, BEAST_MAX));

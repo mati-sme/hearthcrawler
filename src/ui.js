@@ -49,6 +49,7 @@ export class UI {
       this.notes.push({ el, html: q.html, t: 2.8 });
     }
   }
+  clearNotes() { this.queue = []; this.notes.forEach((n) => n.el.remove()); this.notes = []; }
   tickNotes(dt) {
     for (const n of this.notes) { n.t -= dt; if (n.t < 0.4) n.el.classList.add('out'); }
     const done = this.notes.filter((n) => n.t <= 0);
